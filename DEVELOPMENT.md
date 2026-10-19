@@ -28,9 +28,13 @@ Keep the YAML schema authoritative. Semantic invariants live in R and must have 
 
 ## Release
 
-After code review, update DESCRIPTION and NEWS to the same version on `develop`, then run **Perform Release**.
+Prepare DESCRIPTION and NEWS on `develop`, then commit and push.
 
-The workflow runs checks and coverage, publishes the source archive and checksum, and deploys the released documentation.
+Open **Actions → Perform Release → Run workflow**, select `develop`, enter the version, and run it.
+
+The workflow checks the selected commit, creates its tag and GitHub Release, and uploads the archive and checksum.
+
+It then deploys the documentation from the same commit.
 
 Verify the workflow and release assets. If publication fails, rerun the failed job.
 
