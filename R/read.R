@@ -1,26 +1,9 @@
-#' Check the restricted YAML syntax before parsing
-#'
-#' Scan YAML source for constructs excluded from model resources before libyaml
-#' can resolve aliases, merge mappings, or discard explicit tags.
-#' @param text One character string containing the YAML source, with lines
-#'   separated by newline characters. Supplied by [read_yaml_data()].
-#' @param resource Source path or diagnostic label used in error conditions.
-#' @details
-#' The scanner masks quoted strings and comments and skips indented literal or
-#' folded block scalar content. It tracks quotes across lines, including escaped
-#' double quotes and doubled single quotes, so punctuation in prose remains data.
-#'
-#' Outside those regions, it rejects tags, anchors, aliases, merge keys,
-#' directives, and document markers. This is a lexical guard, not a YAML parser:
-#' passing it does not establish valid YAML syntax or a valid model definition.
-#' Parsing and subsequent definition checks are performed by the caller.
-#' @return Invisibly returns `NULL` when no excluded construct is found.
-#'   The source text is not modified.
-#' @section Errors:
-#' Raises `model_form_error` at the first detected excluded construct. The
-#' condition records `resource` and a `path` of the form `"$ (line N)"`, where
-#' `N` is the one-based source line number.
-#' @seealso [read_yaml_data()], [read_form_model()]
+#' Check restricted YAML syntax
+#' @param text YAML source text.
+#' @param resource Source label for errors.
+#' @details Rejects tags, anchors, aliases, merges, directives and document markers
+#'   outside quoted strings, comments and block scalars. Parsing happens separately.
+#' @return Returns silently on success; raises `model_form_error` otherwise.
 #' @keywords internal
 yaml_profile <- function(text, resource) {
   lines <- strsplit(text, "\n", fixed = TRUE)[[1L]]
@@ -69,22 +52,12 @@ yaml_profile <- function(text, resource) {
   }
 }
 
-#' Signal a model error with source context
-#'
-#' Construct and signal the error condition shared by resource loading and
-#' model checking. The condition retains structured context for callers.
-#' @param resource Source path or diagnostic label, such as `"<argument>"`.
-#' @param path Location within the resource, source line, or argument name.
-#' @param message One character string describing the failure.
-#' @param diagnostics Optional diagnostics data frame from definition checking;
-#'   otherwise `NULL`.
-#' @return Does not return; always signals an error.
-#' @section Condition:
-#' The condition inherits from `model_form_error`, `error`, and `condition`.
-#' Its `message` joins `resource`, `path`, and the supplied message with `": "`.
-#' It also contains `resource`, `path`, and `diagnostics` fields and a `NULL`
-#' `call`, so the printed error does not include an internal function call.
-#' @seealso [check_form_model()], [read_form_model()]
+#' Signal a model error
+#' @param resource Source label.
+#' @param path Location within the source.
+#' @param message Error message.
+#' @param diagnostics Optional definition diagnostics.
+#' @return Raises `model_form_error` carrying the supplied context.
 #' @keywords internal
 abort_model <- function(resource, path, message, diagnostics = NULL) {
   stop(structure(list(message = paste0(resource, ": ", path, ": ", message),
@@ -93,18 +66,10 @@ abort_model <- function(resource, path, message, diagnostics = NULL) {
                  class = c("model_form_error", "error", "condition")))
 }
 
-#' Require one nonempty string argument
-#'
-#' Check a shared argument shape without trimming, coercing, or changing it.
-#' Whitespace-only strings satisfy this check; interpretation belongs to callers.
-#' @param x Value to check.
-#' @param name Argument name used as the diagnostic path.
-#' @return Invisibly returns `NULL` when `x` is a length-one character vector
-#'   that is neither `NA` nor the empty string.
-#' @section Errors:
-#' Raises `model_form_error` with resource `"<argument>"` and path `name`
-#' when the value does not satisfy the argument shape.
-#' @seealso [abort_model()]
+#' Require a nonempty string
+#' @param x Value to check; whitespace is not trimmed.
+#' @param name Argument name for errors.
+#' @return Returns silently on success; raises `model_form_error` otherwise.
 #' @keywords internal
 text_arg <- function(x, name) {
   if (!is.character(x) || length(x) != 1L || is.na(x) || !nzchar(x)) {
@@ -112,29 +77,11 @@ text_arg <- function(x, name) {
   }
 }
 
-#' Read a YAML resource as data
-#'
-#' Read an explicit UTF-8 file, enforce the restricted YAML syntax, and parse it
-#' without evaluating expressions. Used for both models and the installed schema.
-#' @param path One nonempty character string naming an existing file.
-#' @details
-#' [yaml_profile()] checks excluded constructs before parsing. The parser uses
-#' YAML 1.1 scalar typing with `eval.expr = FALSE`. A sequence handler preserves
-#' sequences as lists. A mapping handler checks that keys are strings before
-#' converting mappings to named lists, then removes the parser's key attribute.
-#' Duplicate mapping keys are rejected by the YAML parser.
-#'
-#' This helper does not apply the model schema or semantic checks. Call
-#' [read_form_model()] to load and validate a complete model definition.
-#' @return The parsed R value. Mappings are named lists, sequences are unnamed
-#'   lists, and scalars use the YAML parser's types, including `NULL` for null.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid path, a missing file, a directory,
-#' excluded YAML syntax, parsing failures, or non-string mapping keys. Warnings
-#' during parsing are treated as errors. Existing `model_form_error` conditions
-#' retain their context; other reading or parsing errors are wrapped with
-#' `resource = path` and diagnostic path `"$"`.
-#' @seealso [yaml_profile()], [read_form_model()], [form_schema()]
+#' Read restricted YAML as data
+#' @param path UTF-8 YAML file.
+#' @return Parsed data: named lists for mappings and unnamed lists for sequences.
+#' @details Uses YAML 1.1 types without expression evaluation. Invalid syntax,
+#'   non-string keys and parser warnings raise `model_form_error`.
 #' @keywords internal
 read_yaml_data <- function(path) {
   text_arg(path, "path")
@@ -164,15 +111,11 @@ read_yaml_data <- function(path) {
   })
 }
 
-#' Locate an installed model resource
-#'
-#' Resolve a file relative to an explicitly named package's installed directory.
-#' Absolute paths, parent traversal, and symlinks escaping the package are rejected.
-#' @param path Relative resource path, for example `examples/survey-form.yaml`.
-#' @param package Installed package name. No working-directory search is performed.
-#' @return One absolute existing file path.
-#' @section Errors:
-#' Raises `model_form_error` when arguments, package, or resource are invalid.
+#' Locate an installed resource
+#' @param path File path relative to the package directory.
+#' @param package Installed package name.
+#' @return Absolute file path. Missing files and paths escaping the package
+#'   raise `model_form_error`.
 #' @examples
 #' form_resource("examples/survey-form.yaml", "model.form")
 #' @export
@@ -192,24 +135,17 @@ form_resource <- function(path, package) {
   file
 }
 
-#' Load a model definition from YAML
-#'
-#' Parse a single UTF-8 YAML file, check its structure and semantics, and return
-#' a value-like model. Sequences retain order; no value coercions are applied.
-#' @param path Explicit file path, or relative installed resource path when
-#'   `package` is supplied.
-#' @param package Optional installed resource package name; otherwise `NULL`.
-#' @return The checked definition as a `form_model` S3 list. The source path is
-#'   used for loading diagnostics and is not retained in the returned model.
-#' @section Errors:
-#' Raises `model_form_error` for malformed YAML or invalid definitions. Conditions
-#' include `resource`, `path`, and, for definition errors, a diagnostics data frame.
-#' Parsing uses YAML 1.1 typing: quote versions, identifiers and codes. Only
-#' `true`/`false` should be used for booleans; legacy YAML boolean spellings parse
-#' as booleans too. Tags, aliases, anchors, merges and multi-document syntax are rejected.
+#' Read and check a YAML form model
+#' @param path File path, or package-relative path when `package` is supplied.
+#' @param package Optional installed package name.
+#' @return A checked `form_model` list. Invalid YAML or definitions raise
+#'   `model_form_error` with source context and available diagnostics.
+#' @details Uses YAML 1.1 types: quote versions and codes; use `true`/`false`
+#'   for booleans. Tags, anchors, aliases, merges, directives and document markers
+#'   are unsupported. The source path is not stored in the model.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' form_metadata(m)
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' form_metadata(model)
 #' @export
 read_form_model <- function(path, package = NULL) {
   if (!is.null(package)) path <- form_resource(path, package)
@@ -217,24 +153,14 @@ read_form_model <- function(path, package = NULL) {
   as_form_model(definition, normalizePath(path, winslash = "/", mustWork = TRUE))
 }
 
-#' Load a model using its conventional filename
-#'
-#' Resolve exactly `<name>-form.yaml` within the supplied directory, then load
-#' and validate it with [read_form_model()]. No directory scanning or version
-#' guessing occurs. Put different versions in explicitly chosen directories.
-#' @param name Filename prefix, without `-form.yaml`. Starts with a letter and
-#'   contains only letters, digits, underscores, dots, or hyphens. It identifies
-#'   the file family; the form's own ID and version remain in its YAML content.
-#' @param directory Explicit directory containing the model file. For installed
-#'   resources, use `system.file("forms", package = "your.package")`.
-#' @return A validated `form_model`, as returned by [read_form_model()].
-#' @section Errors:
-#' Raises `model_form_error` for invalid names, missing files, or invalid models.
-#' A name cannot contain a path separator or traverse to another directory.
+#' Load a model by filename prefix
+#' @param name Prefix of `<name>-form.yaml`, starting with a letter and containing
+#'   only letters, digits, underscores, dots or hyphens.
+#' @param directory Directory containing the file.
+#' @return A checked `form_model`; see [read_form_model()] for errors.
 #' @examples
 #' directory <- system.file("examples", package = "model.form")
-#' model <- load_form_model("survey", directory)
-#' form_metadata(model)$form$id
+#' load_form_model("survey", directory)
 #' @export
 load_form_model <- function(name, directory) {
   text_arg(name, "name")
@@ -245,18 +171,13 @@ load_form_model <- function(name, directory) {
   read_form_model(file.path(directory, paste0(name, "-form.yaml")))
 }
 
-#' Select exactly one model resource
-#'
-#' Each supplied file is loaded and checked. Invalid unrelated files fail too;
-#' directories are never scanned and there is no implicit latest-version fallback.
-#' @param paths Nonempty character vector of explicit YAML file paths.
+#' Select an exact model version
+#' @param paths Nonempty character vector of YAML file paths.
 #' @param id Exact form identifier.
-#' @param version Exact described form version string.
-#' @param package Optional installed package containing all relative `paths`.
-#' @return The unique matching `form_model`.
-#' @section Errors:
-#' Raises `model_form_error` for invalid resources, missing matches or ambiguity,
-#' including when the same resource is supplied twice.
+#' @param version Exact form version.
+#' @param package Optional installed package containing the relative paths.
+#' @return The matching `form_model`. All files are checked; invalid files or
+#'   anything other than one match raise `model_form_error`.
 #' @examples
 #' select_form_model("examples/survey-form.yaml", "survey", "2026.1",
 #'                   package = "model.form")

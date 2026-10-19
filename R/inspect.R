@@ -1,12 +1,7 @@
-#' Check the model argument shape
-#'
-#' Require a complete definition list inheriting from `form_model`.
-#' This is a shallow guard, not structural or semantic definition validation.
-#' @param model Object passed to a model accessor.
-#' @return Invisibly returns `NULL` on success.
-#' @section Errors:
-#' Raises `model_form_error` with resource `"<argument>"` and path `"model"`
-#' when the object does not have the expected shape.
+#' Check a model argument's shape
+#' @param model Object passed to an accessor.
+#' @return Returns silently for a `form_model` with required top-level properties;
+#'   otherwise raises `model_form_error`. Does not recheck the definition.
 #' @keywords internal
 model_arg <- function(model) {
   required <- c("schema_version", "form", "references", "sheets")
@@ -16,27 +11,14 @@ model_arg <- function(model) {
   }
 }
 
-#' Get the complete model definition
-#'
-#' Return the checked definition as an ordinary nested list, preserving sequence
-#' order, absent properties, and explicit `NULL` values.
-#' @param model A `form_model` returned by [read_form_model()] or [as_form_model()].
-#' @return A named list containing `schema_version`, `form`, `references`, and
-#'   `sheets`, as described by [form_schema()].
-#' @details Accessors do not revalidate the definition. Changing a returned list
-#'   leaves the original model unchanged. Pass an edited definition to
-#'   [as_form_model()] to check it and construct a new model.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid model argument. Direct edits to model
-#' internals bypass construction checks and can cause other accessor errors.
+#' Get the complete definition
+#' @param model A checked `form_model` from [read_form_model()] or [as_form_model()].
+#' @return An ordinary list with `schema_version`, `form`, `references` and `sheets`.
+#' @details Accessors preserve declaration order and do not revalidate models.
+#'   Treat checked models as read-only. Invalid model arguments raise `model_form_error`.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' names(form_definition(m))
-#' d <- form_definition(m)
-#' d$form$version <- "2026.2"
-#' revised <- as_form_model(d)
-#' form_metadata(revised)$form$version
-#' form_metadata(m)$form$version # Original version is unchanged.
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' form_definition(model)$form
 #' @export
 form_definition <- function(model) {
   model_arg(model)
@@ -44,48 +26,28 @@ form_definition <- function(model) {
 }
 
 #' Get form identity and versions
-#'
-#' Read the form identity and model schema version without fields or sheets.
 #' @inheritParams form_definition
-#' @return A named list with `form` and `schema_version`.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid model argument.
+#' @return A list with `form` and `schema_version`.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' meta <- form_metadata(m)
-#' meta$form$id
-#' meta$form$version
-#' @seealso [form_definition()]
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' form_metadata(model)
 #' @export
 form_metadata <- function(model) {
   d <- form_definition(model)
   d[c("form", "schema_version")]
 }
 
-#' Get fields from all sheets or one sheet
-#'
-#' Flatten selected sheets into a list named `<sheet>.<field>`. Fields retain
-#' sheet order, then their order within each sheet. Derived `id`, `name`, `sheet`,
-#' `column`, `mandatory`, and reference severity values make the public result
-#' directly usable while [form_definition()] retains the compact declaration.
+#' Get fields in declaration order
 #' @inheritParams form_definition
-#' @param sheet One exact, case-sensitive worksheet name, or `NULL` for all sheets.
-#' @return A named list of effective field definitions.
-#' @details An omitted `mandatory` becomes `FALSE`. A reference ID
-#'   shorthand expands to a mapping; omitted reference `severity` becomes
-#'   `"error"`. Numeric cell coordinates, table columns, and full field IDs are derived.
-#'   No other optional property receives a value. Use [form_definition()] when
-#'   you need the compact declaration with omissions preserved.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid model, invalid `sheet` argument,
-#' or unknown worksheet name. There is no partial matching or fallback.
+#' @param sheet Exact worksheet name, or `NULL` for all sheets.
+#' @return Field definitions named `<sheet>.<field>`. Unknown sheets raise `model_form_error`.
+#' @details Adds field IDs, names, sheet names and numeric coordinates.
+#'   Omitted `mandatory` becomes `FALSE`; reference shorthand becomes a mapping
+#'   with severity `"error"` when omitted. Other undeclared properties stay absent.
+#'   Use [form_definition()] for the original declarations.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' names(form_fields(m))
-#' fields <- form_fields(m, sheet = "Observations")
-#' names(fields)
-#' vapply(fields, function(field) field$type, character(1))
-#' @seealso [form_field()], [form_sheets()]
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' form_fields(model, sheet = "Observations")
 #' @export
 form_fields <- function(model, sheet = NULL) {
   sheets <- form_sheets(model)
@@ -121,21 +83,13 @@ form_fields <- function(model, sheet = NULL) {
   result
 }
 
-#' Get one field by identifier
-#'
-#' Look up a field across all sheets using its model-wide unique ID.
-#' The declared constraints are returned as data; they are not evaluated.
+#' Get one field
 #' @inheritParams form_definition
-#' @param id One exact `<sheet>.<field>` identifier.
-#' @return One field definition list, with the same properties as an element of
-#'   [form_fields()]. Optional properties remain absent when not declared.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid model, invalid `id` argument, or unknown
-#' identifier. A missing field is an error, not a `NULL` result.
+#' @param id Exact `<sheet>.<field>` identifier.
+#' @return One definition as returned by [form_fields()]. Unknown IDs raise `model_form_error`.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' form_field(m, "Observations.unit")$enum
-#' @seealso [form_fields()]
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' form_field(model, "Observations.unit")$enum
 #' @export
 form_field <- function(model, id) {
   text_arg(id, "id")
@@ -144,40 +98,22 @@ form_field <- function(model, id) {
   fields[[id]]
 }
 
-#' Get workbook sheet definitions
-#'
-#' Return sheets in declaration order, named by their worksheet names.
-#' No workbook is opened or inspected.
+#' Get sheet definitions
 #' @inheritParams form_definition
-#' @return A named list of sheet definitions with `fields` and `layout`.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid model argument.
+#' @return Sheets in declaration order, named by worksheet, each with `fields` and `layout`.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' sheets <- form_sheets(m)
-#' names(sheets)
-#' sheets$Observations$layout$kind
-#' @seealso [form_fields()], [form_layout()]
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' names(form_sheets(model))
 #' @export
 form_sheets <- function(model) form_definition(model)$sheets
 
-#' Get a sheet's cell or table layout
-#'
-#' Look up a worksheet by name and return its declared layout.
+#' Get a sheet layout
 #' @inheritParams form_definition
-#' @param id One exact, case-sensitive worksheet name.
-#' @return A layout list with `kind` (`"cells"` or `"table"`). Table layouts
-#'   have `start_row`. Optional sheet extents remain
-#'   absent unless declared. Coordinates belong to fields, not the layout.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid model, invalid `id` argument,
-#' or unknown worksheet name.
+#' @param id Exact worksheet name.
+#' @return The declared layout (`cells` or `table`). Unknown sheets raise `model_form_error`.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' form_field(m, "Metadata.submission")[c("row", "column")]
-#' table <- form_layout(m, "Observations")
-#' table$start_row
-#' @seealso [form_sheets()]
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' form_layout(model, "Observations")
 #' @export
 form_layout <- function(model, id) {
   text_arg(id, "id")
@@ -186,36 +122,19 @@ form_layout <- function(model, id) {
   sheets[[id]]$layout
 }
 
-#' Get external reference requirements
-#'
-#' Return names of reference datasets needed by downstream validation.
+#' Get reference requirements
 #' @inheritParams form_definition
-#' @return A character vector of reference names, or `character(0)`.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid model argument.
+#' @return Declared reference names. Reference data is not loaded.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' refs <- form_references(m)
-#' refs
-#' form_field(m, "Observations.station")$reference
-#' @seealso [form_field()], [form_metadata()]
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' form_references(model)
 #' @export
 form_references <- function(model) unlist(form_definition(model)$references, use.names = FALSE)
 
-#' Print a form model summary
-#'
-#' Display the form ID, form version, and schema version,
-#' followed by field and sheet counts. The definition is not revalidated.
-#' @param x A `form_model` returned by [read_form_model()] or [as_form_model()].
-#' @param ... Additional arguments; currently ignored.
-#' @return `x`, invisibly. The summary is written to standard output.
-#' @section Errors:
-#' Raises `model_form_error` for an invalid model argument. Expects an unmodified,
-#' checked model; direct edits to its internals can cause other errors.
-#' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' print(m)
-#' @seealso [form_definition()]
+#' Print a model summary
+#' @param x A checked `form_model`.
+#' @param ... Unused.
+#' @return `x`, invisibly; prints identity, versions, and field and sheet counts.
 #' @export
 print.form_model <- function(x, ...) {
   d <- form_definition(x)
@@ -226,20 +145,9 @@ print.form_model <- function(x, ...) {
 }
 
 #' Print definition check results
-#'
-#' Display `valid` or `invalid`, followed by the diagnostics table when nonempty.
-#' Diagnostics show the resource, path, and message without row numbers. Printing
-#' uses the recorded result; it does not run the checks again.
-#' @param x An unmodified `form_model_check` returned by [check_form_model()].
-#' @param ... Additional arguments; currently ignored.
-#' @return `x`, invisibly. The result is written to standard output.
-#' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' print(check_form_model(form_definition(m)))
-#' d <- form_definition(m)
-#' d$sheets[[1]]$fields[[1]]$type <- "unsupported"
-#' print(check_form_model(d, resource = "edited definition"))
-#' @seealso [check_form_model()]
+#' @param x A `form_model_check` from [check_form_model()].
+#' @param ... Unused.
+#' @return `x`, invisibly; prints validity and any diagnostics.
 #' @export
 print.form_model_check <- function(x, ...) {
   cat("<form_model_check> ", if (x$valid) "valid" else "invalid", "\n", sep = "")

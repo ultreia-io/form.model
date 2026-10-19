@@ -1,0 +1,95 @@
+---
+title: "Model specification"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Model specification}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+See [Authoring model definitions](model-authoring.html) to create your first model.
+
+## Field types and constraints
+
+Every field declares a `type`:
+
+- `string`: text.
+- `email`: text matching `^[^\s@]+@[^\s@]+\.[^\s@]+$`; mailbox existence is not checked.
+- `integer`: a finite number without a fractional part.
+- `number`: a finite number.
+- `boolean`: `true` or `false`.
+- `latitude`: a finite number in decimal degrees, from -90 to 90 inclusive.
+- `longitude`: a finite number in decimal degrees, from -180 to 180 inclusive.
+- `date`: a valid date string in `YYYY-MM-DD` format.
+- `datetime`: a valid UTC datetime string in `YYYY-MM-DDTHH:MM:SSZ` format.
+
+Coordinate types already include their geographic bounds. Missing values are governed by requiredness.
+
+Optional constraints are:
+
+- `mandatory`: requires a filled value; omitted means `false`.
+- `required_field`: requires a value when the named field on the same sheet is filled.
+- `enum`: a nonempty list of distinct, non-null values matching the type, bounds and pattern.
+- `minimum`, `maximum`: inclusive numeric bounds; integer bounds must be whole numbers.
+- `pattern`: a PCRE regular expression for string, email, date or datetime fields.
+- `unique`: requires distinct values within a repeated table field.
+- `reference`: a code-list ID declared in the model's `references` list; valid only for string fields.
+
+Enums are constraints, not a separate type. Quote numeric-looking string codes: `enum: ["01", "02"]`.
+
+For conditional fields, `required_field: length` makes the unit required when length is filled, including zero.
+
+In tables, this applies within the same row. A field cannot depend on itself; mutual dependencies are allowed.
+
+The condition still permits a unit when length is empty.
+
+References default to error severity. Use `reference: {id: observers, severity: warning}` for warnings.
+
+The model declares reference names only. Callers supply the code lists when validating submitted data.
+
+See `?form_fields` for the effective field properties returned by accessors.
+
+## Workbook layouts
+
+`sheets` is an ordered mapping of worksheet names. Every declared sheet is required; names are unique ignoring case.
+
+Each sheet has a `layout` followed by `fields`, keyed by local field name.
+
+- `kind: cells`: requires `column_count`. Each field needs a unique uppercase A1 `location`, such as `E3`.
+- `kind: table`: requires `start_row` and `column_count`. Field order defines columns; omit field `location`.
+
+For tables, `column_count` must equal the number of fields. Rows before `start_row` are preamble.
+
+An optional `row_count` declares the exact physical row count. Fixed locations must fit declared dimensions.
+
+Coordinates are one-based. An empty sheet can declare `fields: {}`; an empty table has `column_count: 0`.
+
+## YAML conventions
+
+Use one UTF-8 document. Tags, anchors, aliases, merges, directives and document markers are unsupported.
+
+Mapping keys must be unique strings. Unknown properties are errors.
+
+Quote versions and codes, especially leading-zero codes such as `"01"`.
+
+Use `true` and `false` for booleans. Quote text codes such as `"yes"`, `"no"`, `"on"` and `"off"`.
+
+Empty YAML values, `null` and `~` mean null; `""` means an empty string. Omit unused optional properties.
+
+Identifiers start with an ASCII letter, followed by letters, digits, dots, underscores or hyphens.
+
+Full field IDs combine the sheet and field names: `<sheet>.<field>`.
+
+Write field properties in this order: `mandatory` when true, `location` for cells, `type`, `required_field`, then constraints.
+
+`schema_version: "1.0.0"` selects the package contract. `form.version` independently identifies your model version.
+
+Change `form.version` when the model meaning changes. New schema properties require a supported contract version.
+
+## Definition checks
+
+Load a file with `read_form_model()` to check its structure and consistency.
+
+Use `check_form_model()` on a definition list to get diagnostics with source, property path and message.
+
+Consistency checks run only after structure passes. Submitted-data validation belongs to `model.validation`.

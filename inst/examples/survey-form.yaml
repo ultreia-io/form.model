@@ -1,0 +1,31 @@
+schema_version: 1.0.0
+form:
+  id: survey
+  version: '2026.1'
+references:
+- observers
+- stations
+sheets:
+  # Fixed cells with an exact physical sheet size.
+  Metadata:
+    layout: {kind: cells, column_count: 3, row_count: 5}
+    fields:
+      submission: {mandatory: true, location: C2, type: string, pattern: '^[0-9]{3}$'}
+      date: {mandatory: true, location: C3, type: date}
+      contact_email: {location: C4, type: email}
+      comment: {location: C5, type: string}
+  # Repeated rows; field declaration order determines column order.
+  Observations:
+    layout: {kind: table, column_count: 11, start_row: 6}
+    fields:
+      station: {mandatory: true, type: string, reference: stations}
+      count: {mandatory: true, type: integer, minimum: 0, maximum: 1000}
+      length: {type: number, minimum: 0}
+      unit: {type: string, required_field: length, enum: [cm, m]}
+      active: {mandatory: true, type: boolean}
+      observed_at: {type: datetime}
+      latitude: {type: latitude}
+      longitude: {type: longitude}
+      observation_id: {type: string, pattern: '^OBS-[0-9]{3}$', unique: true}
+      quality: {type: integer, enum: [1, 2, 3]}
+      observer: {type: string, reference: {id: observers, severity: warning}}

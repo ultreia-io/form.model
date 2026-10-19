@@ -1,0 +1,40 @@
+---
+title: "Authoring model definitions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Authoring model definitions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## 1. Copy the example
+
+[Download the survey YAML](https://raw.githubusercontent.com/ultreia-io/model.form/develop/inst/examples/survey-form.yaml)
+and save it as `my-form.yaml`.
+
+
+```{r, results='asis', echo=FALSE}
+cat("```yaml\n", paste(readLines(model.form::form_resource("examples/survey-form.yaml", "model.form")), collapse="\n"), "\n```\n", sep="")
+```
+
+## 2. Edit your fields
+
+For example, a required count and an optional length with its unit:
+
+```yaml
+count: {mandatory: true, type: integer, minimum: 0}
+length: {type: number, minimum: 0}
+unit: {type: string, required_field: length, enum: [cm, m]}
+```
+
+For table sheets, field order is column order. Update `column_count` when adding or removing fields.
+
+## 3. Check your model
+
+```r
+model.form::read_form_model("my-form.yaml")
+```
+
+A valid file returns a model summary; an invalid file reports the problem.
+
+See [Model specification](model-specification.html) for field types, constraints and layouts.

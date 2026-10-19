@@ -1,12 +1,7 @@
-#' Inspect the installed model-definition schema
-#'
-#' The installed YAML file is the single editable structural contract. The small
-#' `model.form/schema/1` dialect is documented in the model-authoring vignette;
-#' it is not a general JSON Schema implementation.
-#' @param version Exact schema contract version; currently `"1.0.0"`.
-#' @return An ordinary nested list, independently parsed on each call.
-#' @section Errors:
-#' Raises `model_form_error` for unsupported versions or unavailable schema files.
+#' Read the model-definition schema
+#' @param version Schema version; currently `"1.0.0"`.
+#' @return The schema as a nested list. Unsupported versions raise `model_form_error`.
+#' @details Uses the package's `model.form/schema/1` dialect, not JSON Schema.
 #' @examples
 #' form_schema()$contract_version
 #' @export
@@ -16,22 +11,16 @@ form_schema <- function(version = "1.0.0") {
   read_yaml_data(form_resource("schema/model-1.0.0.yaml", "model.form"))
 }
 
-#' Check for ordinary value attributes
-#'
-#' Test attributes only; this does not check the value's type or contents.
+#' Check value attributes
 #' @param x Any R object.
-#' @return `TRUE` when `x` has no attributes other than optional names.
+#' @return Whether attributes are absent or limited to names.
 #' @keywords internal
 plain <- function(x) all(names(attributes(x)) %in% "names")
-#' Check a scalar against a schema type
-#'
-#' Require one nonmissing atomic value with no attributes except optional names.
-#' Numeric values must be finite; integer values may use integer or double storage.
-#' No coercion is performed.
-#' @param x Value to check.
-#' @param type One of `string`, `boolean`, `number`, `integer`, or `scalar`.
-#'   The `scalar` type accepts strings, booleans, and finite numbers.
-#' @return One logical value; `FALSE` for an incompatible value or unknown type.
+#' Check a schema scalar type
+#' @param x Value to check without coercion.
+#' @param type `string`, `boolean`, `number`, `integer`, or `scalar`.
+#' @return Whether `x` is one nonmissing, unclassed value of the requested type.
+#'   Numbers must be finite; `scalar` accepts text, logicals and numbers.
 #' @keywords internal
 scalar_type <- function(x, type) {
   if (!is.atomic(x) || !plain(x) || length(x) != 1L || is.na(x)) return(FALSE)
@@ -44,20 +33,13 @@ scalar_type <- function(x, type) {
     FALSE)
 }
 
-#' Collect structural definition diagnostics
-#'
-#' Recursively check mappings, sequences, and scalars against the package schema.
-#' Resolve schema references before checking types, required
-#' properties, allowed values, and size or pattern constraints. A type mismatch
-#' stops traversal of that node; other nodes can still produce diagnostics.
-#' @param x Definition value at the current node.
-#' @param node Schema node describing `x`.
-#' @param definitions Named schema definitions used to resolve `ref` entries.
-#'   The schema is package-owned and must contain valid, acyclic references.
-#' @param path Diagnostic location, starting at `"$"` for the definition root.
-#' @param add Callback accepting `(path, message)` to append a diagnostic.
-#'   Its return value is ignored.
-#' @return Invisibly returns `NULL`; findings are passed to `add`.
+#' Collect schema diagnostics
+#' @param x Definition value.
+#' @param node Schema node.
+#' @param definitions Schema definitions for resolving references.
+#' @param path Diagnostic location.
+#' @param add Callback receiving `(path, message)`.
+#' @return Invisible `NULL`; diagnostics are passed to `add`.
 #' @keywords internal
 schema_check <- function(x, node, definitions, path, add) {
   while (!is.null(node$ref)) node <- definitions[[node$ref]]
@@ -106,15 +88,10 @@ schema_check <- function(x, node, definitions, path, add) {
 }
 
 #' Collect model consistency diagnostics
-#'
-#' Check identifier uniqueness, references, field constraints, enums, workbook
-#' coordinates, and same-sheet conditional dependencies.
-#' This checks model definitions only, never submitted data or external references.
-#' @param d Definition that has already passed structural schema checking.
-#' @param add Callback accepting `(path, message)` to append a diagnostic.
-#'   Its return value is ignored.
-#' @return Invisibly returns `NULL`; findings are passed to `add`.
-#' @seealso [check_form_model()]
+#' @param d Definition that has passed schema checking.
+#' @param add Callback receiving `(path, message)`.
+#' @return Diagnostics for references, constraints, dependencies and layouts,
+#'   passed to `add`.
 #' @keywords internal
 semantic_check <- function(d, add) {
   references <- unlist(d$references, use.names = FALSE)
@@ -240,24 +217,17 @@ semantic_check <- function(d, add) {
   }
 }
 
-#' Check a model definition
-#'
-#' Check an ordinary definition list against the installed YAML schema, then
-#' check identifiers, references, constraints and layout consistency. This does
-#' not execute submitted-data validation. Semantic checks run only if structure
-#' is valid, preventing misleading follow-on errors.
-#' @param definition Ordinary named list with the structure described by
-#'   [form_schema()]. YAML sequences are unnamed lists, including singleton lists.
-#' @param resource Diagnostic source label, default `"<list>"`.
-#' @return A `form_model_check` list with logical `valid` and `diagnostics`, a
-#'   data frame with character columns `resource`, `path`, `message` (zero rows
-#'   on success). Missing and explicit `NULL` properties are distinct.
-#' @section Errors:
-#' Invalid definitions return diagnostics rather than throwing. Invalid API
-#' arguments or a missing installed schema raise `model_form_error`.
+#' Check a form definition
+#' @param definition Named list following [form_schema()]; sequences are unnamed lists.
+#' @param resource Source label for diagnostics.
+#' @return A `form_model_check` with `valid` and a `diagnostics` data frame
+#'   containing `resource`, `path` and `message` columns.
+#' @details Checks schema structure, then model consistency if structure passes.
+#'   Invalid definitions return diagnostics; invalid arguments raise `model_form_error`.
+#'   Submitted data is not checked.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' check_form_model(form_definition(m))
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' check_form_model(form_definition(model))
 #' @export
 check_form_model <- function(definition, resource = "<list>") {
   text_arg(resource, "resource")
@@ -272,18 +242,13 @@ check_form_model <- function(definition, resource = "<list>") {
   structure(list(valid = nrow(diagnostics) == 0L, diagnostics = diagnostics), class = "form_model_check")
 }
 
-#' Construct a checked value-like model
-#'
+#' Construct a checked model
 #' @inheritParams check_form_model
-#' @return The checked definition as a `form_model` list. It contains only the
-#'   declared model properties. Sheet and field mapping keys remain list names.
-#'   The diagnostic `resource` label is not retained. Reconstruct after edits to
-#'   recheck consistency.
-#' @section Errors:
-#' Raises `model_form_error` on invalid definitions with all diagnostics attached.
+#' @return The definition as a `form_model` list, without the source label.
+#'   Invalid definitions raise `model_form_error` with diagnostics.
 #' @examples
-#' m <- read_form_model("examples/survey-form.yaml", "model.form")
-#' as_form_model(form_definition(m))
+#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' as_form_model(form_definition(model))
 #' @export
 as_form_model <- function(definition, resource = "<list>") {
   result <- check_form_model(definition, resource)
