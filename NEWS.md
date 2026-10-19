@@ -1,9 +1,8 @@
 # model.form 0.1.0
 
-* Introduce schema contract 1.0.0 for neutral versioned form resources.
-* Load strict YAML, check structure and semantics, and select exact versions.
-* Inspect ordered sheets, fields, layouts, and reference requirements.
-* Include installed synthetic resources, guides, tests, and release automation.
-* Load named models from `<name>-form.yaml` in an explicit directory.
-* Return the checked model definition directly without retaining its file path.
-* Keep definitions limited to form metadata, references, fields, and workbook layouts.
+* Load versioned YAML form definitions and check them against schema 1.0.0 and semantic constraints.
+* Inspect ordered sheets, fields, cell and table layouts, and reference requirements.
+* Support string, email, integer, number, boolean, latitude, longitude, date, and datetime fields.
+* Define mandatory and conditional fields, enums, bounds, patterns, uniqueness, and code-list references.
+* Expose shared field type checks for downstream validation packages.
+* Include a complete survey example and guides for model authors and downstream packages.
