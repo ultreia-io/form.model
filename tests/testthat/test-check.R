@@ -71,7 +71,6 @@ test_that("declared constraints are coherent", {
 test_that("workbook layout locations and extents are checked", {
   changes <- list(
     list(c("sheets",2,"layout","start_row"), NULL, ".start_row", "requires start_row"),
-    list(c("sheets",2,"layout","column_count"), NULL, ".column_count", "requires column_count"),
     list(c("sheets",1,"layout","column_count"), NULL, ".column_count", "requires column_count"),
     list(c("sheets",1,"layout","start_row"), 1L, ".layout", "cannot have table"),
     list(c("sheets",2,"layout","header_row"), 6L, ".header_row", "unsupported property"),

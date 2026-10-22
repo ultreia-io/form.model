@@ -56,13 +56,15 @@ See `?form_fields` for the effective field properties returned by accessors.
 Each sheet has a `layout` followed by `fields`, keyed by local field name.
 
 - `kind: cells`: requires `column_count`. Each field needs a unique uppercase A1 `location`, such as `E3`.
-- `kind: table`: requires `start_row` and `column_count`. Field order defines columns; omit field `location`.
+- `kind: table`: requires `start_row`. Field order defines columns; omit field `location` and layout `column_count`.
 
-For tables, `column_count` must equal the number of fields. Rows before `start_row` are preamble.
+Table column counts are derived from the fields. An explicit `column_count` must match that count.
+
+Rows before `start_row` are preamble.
 
 An optional `row_count` declares the exact physical row count. Fixed locations must fit declared dimensions.
 
-Coordinates are one-based. An empty sheet can declare `fields: {}`; an empty table has `column_count: 0`.
+Coordinates are one-based. An empty sheet can declare `fields: {}`; an empty table derives a column count of zero.
 
 ## YAML conventions
 

@@ -107,9 +107,6 @@ semantic_check <- function(d, add) {
     table <- layout$kind == "table"
     layout_path <- paste0("$.sheets.", sheet_name, ".layout")
     if (table && is.null(layout$start_row)) add(paste0(layout_path, ".start_row"), "table requires start_row")
-    if (table && is.null(layout$column_count)) {
-      add(paste0(layout_path, ".column_count"), "table requires column_count")
-    }
     if (!table && is.null(layout$column_count)) {
       add(paste0(layout_path, ".column_count"), "cell layout requires column_count")
     }

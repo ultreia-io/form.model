@@ -27,7 +27,7 @@ length: {type: number, minimum: 0}
 unit: {type: string, required_field: length, enum: [cm, m]}
 ```
 
-For table sheets, field order is column order. Update `column_count` when adding or removing fields.
+For table sheets, field order is column order. The column count is derived from the fields; omit `column_count`.
 
 ## 3. Check your model
 

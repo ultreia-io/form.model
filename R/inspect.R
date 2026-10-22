@@ -101,16 +101,27 @@ form_field <- function(model, id) {
 #' Get sheet definitions
 #' @inheritParams form_definition
 #' @return Sheets in declaration order, named by worksheet, each with `fields` and `layout`.
+#' @details Table layouts include `column_count` derived from the ordered fields.
+#'   Use [form_definition()] for the original declarations.
 #' @examples
 #' model <- read_form_model("examples/survey-form.yaml", "model.form")
 #' names(form_sheets(model))
 #' @export
-form_sheets <- function(model) form_definition(model)$sheets
+form_sheets <- function(model) {
+  sheets <- form_definition(model)$sheets
+  for (name in names(sheets)) {
+    if (sheets[[name]]$layout$kind == "table") {
+      sheets[[name]]$layout$column_count <- length(sheets[[name]]$fields)
+    }
+  }
+  sheets
+}
 
 #' Get a sheet layout
 #' @inheritParams form_definition
 #' @param id Exact worksheet name.
-#' @return The declared layout (`cells` or `table`). Unknown sheets raise `model_form_error`.
+#' @return The effective layout (`cells` or `table`), with table `column_count`
+#'   derived from the fields. Unknown sheets raise `model_form_error`.
 #' @examples
 #' model <- read_form_model("examples/survey-form.yaml", "model.form")
 #' form_layout(model, "Observations")

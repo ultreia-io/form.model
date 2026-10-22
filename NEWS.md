@@ -1,3 +1,7 @@
+# model.form 0.2.0
+
+* Derive table column counts from the ordered field definitions; remove redundant `layout.column_count` declarations.
+
 # model.form 0.1.0
 
 * Load versioned YAML form definitions and check them against schema 1.0.0 and semantic constraints.
