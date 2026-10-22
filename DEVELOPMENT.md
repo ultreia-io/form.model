@@ -72,14 +72,18 @@ Keep the YAML schema authoritative. Semantic invariants live in R and must have 
    3. **Commit the changes:** use `[form.model] Release <version>`, for example `[form.model] Release 0.2.0`.
    4. **Push the release commit.**
 
-2. **Start the release on GitHub:** open **Actions → Start Release → Run workflow**, select `develop` and run it. The version is read from `DESCRIPTION`. This creates a release branch and opens a pull request to merge it into `main`.
-3. **Merge the release PR:** wait for all checks to be green, then select **Create a merge commit**.
+2. **Start the release on GitHub:**
 
-**Publish Release** then publishes the versioned package, checksum and documentation automatically.
+   1. Open **Actions → Start Release**.
+   2. Click **Run workflow**, select `develop`, then click **Run workflow** to confirm.
+   3. Open the release PR created by the workflow.
 
-Coverage runs automatically on pushes to `main` after the release merge, alongside publication without blocking it.
+3. **Merge the release PR:**
 
-Run **Actions → Test Coverage → Run workflow** for coverage on demand. Build still runs tests on every push and PR.
+   1. **Wait for the checks:** all checks on the release PR must be green.
+   2. **Merge:** click **Merge pull request**, then **Confirm merge**.
+
+**Publish Release** publishes the package, checksum and documentation automatically.
 
 ## License
 

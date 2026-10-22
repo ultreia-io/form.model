@@ -58,16 +58,16 @@ jobs:
           path: |
             /var/cache/apt/archives
             /var/lib/apt/lists
-          key: apt-rocker-4.6.1-${{ runner.arch }}-v1-${{ steps.apt-cache.outputs.week }}
+          key: apt-coverage-rocker-4.6.1-${{ runner.arch }}-v1-${{ steps.apt-cache.outputs.week }}
           restore-keys: |
-            apt-rocker-4.6.1-${{ runner.arch }}-v1-
+            apt-coverage-rocker-4.6.1-${{ runner.arch }}-v1-
 
-      # Add Git, R check tools and lsb_release, which setup-r uses to identify Ubuntu.
+      # Add Git, R check tools, Ubuntu identification and curl/gpg required by the Codecov uploader.
       - name: Install Linux check tools
         if: runner.os == 'Linux'
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends git qpdf ghostscript lsb-release
+          apt-get install -y --no-install-recommends git qpdf ghostscript lsb-release curl gpg
 
       # Use the requested ref, or the event commit (the proposed merge for PRs).
       - name: Check out repository
