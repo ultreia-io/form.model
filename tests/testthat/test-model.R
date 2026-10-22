@@ -45,7 +45,7 @@ test_that("compact declarations expose effective field values", {
 test_that("selection requires exact form identity and rejects ambiguity", {
   path <- example_path()
   expect_identical(select_form_model(path, "survey", "2026.1"), example_model())
-  expect_s3_class(select_form_model("examples/survey-form.yaml", "survey", "2026.1", "model.form"), "form_model")
+  expect_s3_class(select_form_model("examples/survey-form.yaml", "survey", "2026.1", "form.model"), "form_model")
   expect_error(select_form_model(path, "Survey", "2026.1"), "matched 0")
   expect_error(select_form_model(path, "survey", "2026"), "matched 0")
   expect_error(select_form_model(c(path, path), "survey", "2026.1"), "matched 2")
@@ -55,11 +55,11 @@ test_that("selection requires exact form identity and rejects ambiguity", {
 })
 
 test_that("resources and argument errors are explicit", {
-  expect_error(form_resource("../DESCRIPTION", "model.form"), "parent traversal")
-  expect_error(form_resource("/tmp/missing", "model.form"), "relative path")
+  expect_error(form_resource("../DESCRIPTION", "form.model"), "parent traversal")
+  expect_error(form_resource("/tmp/missing", "form.model"), "relative path")
   expect_error(form_resource("DESCRIPTION", "not.a.real.package.123"), "not installed")
-  expect_error(form_resource("missing", "model.form"), "does not exist")
-  expect_error(form_resource("examples", "model.form"), "file does not exist")
+  expect_error(form_resource("missing", "form.model"), "does not exist")
+  expect_error(form_resource("examples", "form.model"), "file does not exist")
   expect_error(read_form_model(tempfile()), "does not exist")
   expect_error(read_form_model(tempdir()), "regular file")
   expect_error(read_form_model(NA_character_), "nonempty string")

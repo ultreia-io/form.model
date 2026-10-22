@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible model.form problem
+description: Report a reproducible form.model problem
 assignees: [ultreiaio]
 labels: ["type::bug", "priority::normal", "status::new"]
 body:

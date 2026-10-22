@@ -1,4 +1,4 @@
-example_path <- function() form_resource("examples/survey-form.yaml", "model.form")
+example_path <- function() form_resource("examples/survey-form.yaml", "form.model")
 example_model <- function() read_form_model(example_path())
 definition <- function() form_definition(example_model())
 expect_bad <- function(d, property, message) {

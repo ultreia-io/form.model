@@ -9,12 +9,12 @@ vignette: >
 
 ## 1. Copy the example
 
-[Download the survey YAML](https://raw.githubusercontent.com/ultreia-io/model.form/develop/inst/examples/survey-form.yaml)
+[Download the survey YAML](https://raw.githubusercontent.com/ultreia-io/form.model/develop/inst/examples/survey-form.yaml)
 and save it as `my-form.yaml`.
 
 
 ```{r, results='asis', echo=FALSE}
-cat("```yaml\n", paste(readLines(model.form::form_resource("examples/survey-form.yaml", "model.form")), collapse="\n"), "\n```\n", sep="")
+cat("```yaml\n", paste(readLines(form.model::form_resource("examples/survey-form.yaml", "form.model")), collapse="\n"), "\n```\n", sep="")
 ```
 
 ## 2. Edit your fields
@@ -27,12 +27,12 @@ length: {type: number, minimum: 0}
 unit: {type: string, required_field: length, enum: [cm, m]}
 ```
 
-For table sheets, field order is column order. Update `column_count` when adding or removing fields.
+For table sheets, field order is column order. The column count is derived from the fields; omit `column_count`.
 
 ## 3. Check your model
 
 ```r
-model.form::read_form_model("my-form.yaml")
+form.model::read_form_model("my-form.yaml")
 ```
 
 A valid file returns a model summary; an invalid file reports the problem.

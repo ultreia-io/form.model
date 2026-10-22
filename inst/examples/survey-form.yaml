@@ -16,7 +16,7 @@ sheets:
       comment: {location: C5, type: string}
   # Repeated rows; field declaration order determines column order.
   Observations:
-    layout: {kind: table, column_count: 11, start_row: 6}
+    layout: {kind: table, start_row: 6}
     fields:
       station: {mandatory: true, type: string, reference: stations}
       count: {mandatory: true, type: integer, minimum: 0, maximum: 1000}

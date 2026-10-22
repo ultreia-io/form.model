@@ -31,7 +31,7 @@ test_that("YAML typing never silently coerces identifiers or versions", {
 test_that("literal YAML text remains data", {
   path <- yaml_file(c(readLines(example_path()), "# & ! * ignored comment"))
   expect_s3_class(read_form_model(path), "form_model")
-  raw <- model.form:::read_yaml_data(yaml_file("a: |\n  !tag\n  &anchor\nb: 'can''t !tag'\nc: \"escaped \\\" quote\""))
+  raw <- form.model:::read_yaml_data(yaml_file("a: |\n  !tag\n  &anchor\nb: 'can''t !tag'\nc: \"escaped \\\" quote\""))
   expect_identical(raw$a, "!tag\n&anchor\n")
   expect_identical(raw$b, "can't !tag")
 })

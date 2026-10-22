@@ -12,12 +12,12 @@ model_arg <- function(model) {
 }
 
 #' Get the complete definition
-#' @param model A checked `form_model` from [read_form_model()] or [as_form_model()].
+#' @param model A checked `form_model` from [`read_form_model()`][form.model::read_form_model] or [`as_form_model()`][form.model::as_form_model].
 #' @return An ordinary list with `schema_version`, `form`, `references` and `sheets`.
 #' @details Accessors preserve declaration order and do not revalidate models.
 #'   Treat checked models as read-only. Invalid model arguments raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' form_definition(model)$form
 #' @export
 form_definition <- function(model) {
@@ -29,7 +29,7 @@ form_definition <- function(model) {
 #' @inheritParams form_definition
 #' @return A list with `form` and `schema_version`.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' form_metadata(model)
 #' @export
 form_metadata <- function(model) {
@@ -44,9 +44,9 @@ form_metadata <- function(model) {
 #' @details Adds field IDs, names, sheet names and numeric coordinates.
 #'   Omitted `mandatory` becomes `FALSE`; reference shorthand becomes a mapping
 #'   with severity `"error"` when omitted. Other undeclared properties stay absent.
-#'   Use [form_definition()] for the original declarations.
+#'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' form_fields(model, sheet = "Observations")
 #' @export
 form_fields <- function(model, sheet = NULL) {
@@ -86,9 +86,9 @@ form_fields <- function(model, sheet = NULL) {
 #' Get one field
 #' @inheritParams form_definition
 #' @param id Exact `<sheet>.<field>` identifier.
-#' @return One definition as returned by [form_fields()]. Unknown IDs raise `model_form_error`.
+#' @return One definition as returned by [`form_fields()`][form.model::form_fields]. Unknown IDs raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' form_field(model, "Observations.unit")$enum
 #' @export
 form_field <- function(model, id) {
@@ -101,18 +101,29 @@ form_field <- function(model, id) {
 #' Get sheet definitions
 #' @inheritParams form_definition
 #' @return Sheets in declaration order, named by worksheet, each with `fields` and `layout`.
+#' @details Table layouts include `column_count` derived from the ordered fields.
+#'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' names(form_sheets(model))
 #' @export
-form_sheets <- function(model) form_definition(model)$sheets
+form_sheets <- function(model) {
+  sheets <- form_definition(model)$sheets
+  for (name in names(sheets)) {
+    if (sheets[[name]]$layout$kind == "table") {
+      sheets[[name]]$layout$column_count <- length(sheets[[name]]$fields)
+    }
+  }
+  sheets
+}
 
 #' Get a sheet layout
 #' @inheritParams form_definition
 #' @param id Exact worksheet name.
-#' @return The declared layout (`cells` or `table`). Unknown sheets raise `model_form_error`.
+#' @return The effective layout (`cells` or `table`), with table `column_count`
+#'   derived from the fields. Unknown sheets raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' form_layout(model, "Observations")
 #' @export
 form_layout <- function(model, id) {
@@ -126,7 +137,7 @@ form_layout <- function(model, id) {
 #' @inheritParams form_definition
 #' @return Declared reference names. Reference data is not loaded.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' form_references(model)
 #' @export
 form_references <- function(model) unlist(form_definition(model)$references, use.names = FALSE)
@@ -145,7 +156,7 @@ print.form_model <- function(x, ...) {
 }
 
 #' Print definition check results
-#' @param x A `form_model_check` from [check_form_model()].
+#' @param x A `form_model_check` from [`check_form_model()`][form.model::check_form_model].
 #' @param ... Unused.
 #' @return `x`, invisibly; prints validity and any diagnostics.
 #' @export

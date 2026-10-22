@@ -1,4 +1,4 @@
-url: https://ultreia-io.github.io/model.form/
+url: https://ultreia-io.github.io/form.model/
 template:
   bootstrap: 5
   light-switch: true
@@ -21,7 +21,7 @@ reference:
 articles:
   - title: Guides
     navbar: Guides
-    contents: [model.form, model-authoring, model-specification, downstream-packages]
+    contents: [form.model, model-authoring, model-specification, downstream-packages]
   - title: Development
     contents: [articles/coverage]
 navbar:
@@ -32,8 +32,6 @@ navbar:
     articles:
       text: Articles
       menu:
-        - text: Get started
-          href: articles/model.form.html
         - text: Authoring model definitions
           href: articles/model-authoring.html
         - text: Model specification
@@ -45,7 +43,7 @@ navbar:
       href: articles/coverage.html
     intro:
       text: Get started
-      href: articles/model.form.html
+      href: articles/form.model.html
     community:
       text: Community
       menu:

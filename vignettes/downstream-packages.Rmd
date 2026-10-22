@@ -9,7 +9,7 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(model.form)
+library(form.model)
 ```
 
 
@@ -27,12 +27,12 @@ exampleforms/
   inst/forms/survey-form.yaml
 ```
 
-Declare `Imports: model.form` in `DESCRIPTION`. Supply a documented wrapper with explicit resource selection.
+Declare `Imports: form.model` in `DESCRIPTION`. Supply a documented wrapper with explicit resource selection.
 
 ```r
 # In exampleforms/R/survey.R:
 survey_model <- function() {
-  model.form::select_form_model(
+  form.model::select_form_model(
     "forms/survey-form.yaml",
     id = "survey", version = "2026.1",
     package = "exampleforms"
@@ -47,7 +47,7 @@ survey_model <- function() {
 The bundled example uses exactly the same installed-resource mechanism.
 
 ```{r}
-path <- form_resource("examples/survey-form.yaml", "model.form")
+path <- form_resource("examples/survey-form.yaml", "form.model")
 stopifnot(file.exists(path))
 m <- select_form_model(path, "survey", "2026.1")
 form_references(m)
