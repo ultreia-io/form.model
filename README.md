@@ -22,18 +22,18 @@ data.**
 
 ## Installation
 
-Download the source archive from [GitHub
-Releases](https://github.com/ultreia-io/model.form/releases).
+Install the latest released version directly from GitHub:
 
 ``` r
-install.packages("model.form_0.1.0.tar.gz", repos = NULL, type = "source")
+install.packages("pak") # Once
+pak::pak("ultreia-io/model.form@*release")
 ```
 
-Install the runtime dependency `yaml` first if needed. For the
-development version:
+`pak` downloads the package and installs its dependencies automatically.
+
+For the development version:
 
 ``` r
-# install.packages("pak")
 pak::pak("ultreia-io/model.form@develop")
 ```
 
@@ -100,15 +100,17 @@ These omitted properties receive values from `model.form`:
 | `mandatory` omitted          | The field may be absent or null; `form_fields()` returns `mandatory = FALSE`. |
 | Reference `severity` omitted | An unknown code is an error; `form_fields()` returns `severity = "error"`.    |
 
-Other omissions do not invent values.
+Table column counts are derived from the fields. Other omissions do not invent values.
 
 Every sheet listed under `sheets` is mandatory. There is no sheet-level
-flag. Every layout declares `column_count`. For tables, it must equal
-the number of fields, whose mapping order defines column order. An
+flag. Cell layouts declare `column_count`. Table column counts are derived
+from the fields, whose mapping order defines column order. An explicit table
+`column_count` is optional and must match the number of fields. An
 optional `row_count` declares an exact extent. Fixed fields must lie
 inside all declared dimensions.
 
 `form_definition()` preserves the compact YAML declaration.
+`form_sheets()` and `form_layout()` expose the derived table column counts.
 `form_fields()` returns effective fields with derived full IDs, columns,
 and the resolved defaults above.
 

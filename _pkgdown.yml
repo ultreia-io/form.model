@@ -32,8 +32,6 @@ navbar:
     articles:
       text: Articles
       menu:
-        - text: Get started
-          href: articles/model.form.html
         - text: Authoring model definitions
           href: articles/model-authoring.html
         - text: Model specification

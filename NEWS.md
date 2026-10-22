@@ -1,6 +1,7 @@
 # model.form 0.2.0
 
 * Derive table column counts from the ordered field definitions; remove redundant `layout.column_count` declarations.
+* Simplify installation instructions and guide navigation.
 
 # model.form 0.1.0
 

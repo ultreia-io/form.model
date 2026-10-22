@@ -12,7 +12,7 @@ model_arg <- function(model) {
 }
 
 #' Get the complete definition
-#' @param model A checked `form_model` from [read_form_model()] or [as_form_model()].
+#' @param model A checked `form_model` from [`read_form_model()`][model.form::read_form_model] or [`as_form_model()`][model.form::as_form_model].
 #' @return An ordinary list with `schema_version`, `form`, `references` and `sheets`.
 #' @details Accessors preserve declaration order and do not revalidate models.
 #'   Treat checked models as read-only. Invalid model arguments raise `model_form_error`.
@@ -44,7 +44,7 @@ form_metadata <- function(model) {
 #' @details Adds field IDs, names, sheet names and numeric coordinates.
 #'   Omitted `mandatory` becomes `FALSE`; reference shorthand becomes a mapping
 #'   with severity `"error"` when omitted. Other undeclared properties stay absent.
-#'   Use [form_definition()] for the original declarations.
+#'   Use [`form_definition()`][model.form::form_definition] for the original declarations.
 #' @examples
 #' model <- read_form_model("examples/survey-form.yaml", "model.form")
 #' form_fields(model, sheet = "Observations")
@@ -86,7 +86,7 @@ form_fields <- function(model, sheet = NULL) {
 #' Get one field
 #' @inheritParams form_definition
 #' @param id Exact `<sheet>.<field>` identifier.
-#' @return One definition as returned by [form_fields()]. Unknown IDs raise `model_form_error`.
+#' @return One definition as returned by [`form_fields()`][model.form::form_fields]. Unknown IDs raise `model_form_error`.
 #' @examples
 #' model <- read_form_model("examples/survey-form.yaml", "model.form")
 #' form_field(model, "Observations.unit")$enum
@@ -102,7 +102,7 @@ form_field <- function(model, id) {
 #' @inheritParams form_definition
 #' @return Sheets in declaration order, named by worksheet, each with `fields` and `layout`.
 #' @details Table layouts include `column_count` derived from the ordered fields.
-#'   Use [form_definition()] for the original declarations.
+#'   Use [`form_definition()`][model.form::form_definition] for the original declarations.
 #' @examples
 #' model <- read_form_model("examples/survey-form.yaml", "model.form")
 #' names(form_sheets(model))
@@ -156,7 +156,7 @@ print.form_model <- function(x, ...) {
 }
 
 #' Print definition check results
-#' @param x A `form_model_check` from [check_form_model()].
+#' @param x A `form_model_check` from [`check_form_model()`][model.form::check_form_model].
 #' @param ... Unused.
 #' @return `x`, invisibly; prints validity and any diagnostics.
 #' @export

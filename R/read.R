@@ -157,7 +157,7 @@ read_form_model <- function(path, package = NULL) {
 #' @param name Prefix of `<name>-form.yaml`, starting with a letter and containing
 #'   only letters, digits, underscores, dots or hyphens.
 #' @param directory Directory containing the file.
-#' @return A checked `form_model`; see [read_form_model()] for errors.
+#' @return A checked `form_model`; see [`read_form_model()`][model.form::read_form_model] for errors.
 #' @examples
 #' directory <- system.file("examples", package = "model.form")
 #' load_form_model("survey", directory)

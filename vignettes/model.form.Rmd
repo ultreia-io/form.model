@@ -13,21 +13,18 @@ library(model.form)
 ```
 
 
-The package turns a YAML form description into a checked R list, then provides functions to inspect it.
+## About this example
 
-It describes fields, constraints, and workbook layouts. It does not read or validate completed workbooks.
+This guide demonstrates the bundled survey form definition.
 
-To try the examples from a project checkout, first run this in the project directory:
+You will load the model, inspect its contents, and see how invalid definitions are reported.
 
-```r
-pkgload::load_all()
-```
-
-For an installed package, use `library(model.form)` instead.
+This package checks form definitions. Submitted-data validation belongs to `model.validation`.
 
 ## Load an installed example
 
 ```{r}
+library(model.form)
 directory <- system.file("examples", package = "model.form")
 m <- load_form_model("survey", directory)
 m
@@ -63,40 +60,6 @@ The YAML path is used in loading errors, then discarded after a successful load.
 
 The S3 class selects the compact `print()` method shown above. It does not make the object immutable.
 
-## How the R code fits together
-
-The files organize functions in one package namespace. You do not source each file separately.
-
-| File        | Responsibility                                          |
-| ----------- | ------------------------------------------------------- |
-| `read.R`    | Locate resources and parse the restricted YAML format    |
-| `check.R`   | Check definitions and construct valid model objects      |
-| `inspect.R` | Retrieve definition parts and print summaries            |
-
-Loading follows this call sequence:
-
-```text
-read_form_model()
-  +-- form_resource()       Resolve the path when package is supplied
-  +-- read_yaml_data()
-  |     +-- yaml_profile()  Reject excluded YAML constructs
-  |     +-- yaml::yaml.load() Parse data without evaluating expressions
-  +-- as_form_model()
-        +-- check_form_model()
-              +-- form_schema()    Load the package-owned structural schema
-              +-- schema_check()   Check properties and value types
-              +-- semantic_check() Check references and consistency
-```
-
-Model definitions are checked in two steps:
-
-1. **Structure:** required properties and their types, such as a field's `type`.
-2. **Consistency:** valid combinations, such as unique cell locations and `minimum <= maximum`.
-
-Consistency checks run only when structure passes.
-
-`check_form_model()` returns diagnostics. `read_form_model()` and `as_form_model()` reject invalid definitions.
-
 ## Diagnose a definition
 
 ```{r}
@@ -114,3 +77,10 @@ error <- tryCatch(as_form_model(d, "my-definition.yaml"), model_form_error = ide
 error$path
 error$diagnostics
 ```
+
+## Read next
+
+- [Authoring model definitions](model-authoring.html): create your own form.
+- [Model specification](model-specification.html): field types, constraints and layouts.
+- [Distributing models](downstream-packages.html): use models in another package.
+- [Function reference](https://ultreia-io.github.io/model.form/reference/index.html): API details.

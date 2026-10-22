@@ -2,6 +2,42 @@
 
 `develop` is the integration branch. `main` contains releases. Implementation branches use `feature/`.
 
+## Code organization
+
+The files organize functions in one package namespace. You do not source each file separately.
+
+| File                   | Responsibility                                  |
+| ---------------------- | ----------------------------------------------- |
+| `read.R`               | Locate resources and parse YAML.                |
+| `check.R`              | Check definitions and construct checked models. |
+| `inspect.R`            | Retrieve model properties and print summaries.  |
+| `values.R`             | Provide shared field-type checks.               |
+| `model.form-package.R` | Provide package-level documentation.            |
+
+Loading follows this call sequence:
+
+```text
+read_form_model()
+  +-- form_resource()       Resolve the path when package is supplied
+  +-- read_yaml_data()
+  |     +-- yaml_profile()  Reject excluded YAML constructs
+  |     +-- yaml::yaml.load() Parse data without evaluating expressions
+  +-- as_form_model()
+        +-- check_form_model()
+              +-- form_schema()    Load the package-owned structural schema
+              +-- schema_check()   Check properties and value types
+              +-- semantic_check() Check references and consistency
+```
+
+Model definitions are checked in two steps:
+
+1. **Structure:** required properties and their types, such as a field's `type`.
+2. **Consistency:** valid combinations, such as unique cell locations and `minimum <= maximum`.
+
+Consistency checks run only when structure passes.
+
+`check_form_model()` returns diagnostics. `read_form_model()` and `as_form_model()` reject invalid definitions.
+
 ## Local verification
 
 Run from the package root with development dependencies installed:

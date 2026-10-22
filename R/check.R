@@ -215,7 +215,7 @@ semantic_check <- function(d, add) {
 }
 
 #' Check a form definition
-#' @param definition Named list following [form_schema()]; sequences are unnamed lists.
+#' @param definition Named list following [`form_schema()`][model.form::form_schema]; sequences are unnamed lists.
 #' @param resource Source label for diagnostics.
 #' @return A `form_model_check` with `valid` and a `diagnostics` data frame
 #'   containing `resource`, `path` and `message` columns.
