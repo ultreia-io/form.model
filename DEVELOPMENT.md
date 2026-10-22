@@ -43,10 +43,11 @@ Consistency checks run only when structure passes.
 Run from the package root with development dependencies installed:
 
 ```sh
-Rscript -e 'roxygen2::roxygenise(); rmarkdown::render("README.Rmd"); testthat::test_local()'
+Rscript -e 'roxygen2::roxygenise(); testthat::test_local()'
 mkdir -p build
 (cd build && R CMD build --no-manual ..)
-R CMD check --no-manual --output=build build/model.form_0.1.0.tar.gz
+package_version=$(Rscript -e 'cat(read.dcf("DESCRIPTION")[1, "Version"])')
+R CMD check --no-manual --output=build "build/model.form_${package_version}.tar.gz"
 Rscript tools/build-site.R
 ```
 
@@ -64,15 +65,21 @@ Keep the YAML schema authoritative. Semantic invariants live in R and must have 
 
 ## Release
 
-Prepare DESCRIPTION and NEWS on `develop`, then commit and push.
+1. **Prepare the release on `develop`:**
 
-Open **Actions → Perform Release → Run workflow**, select `develop`, enter the version, and run it.
+   1. **Prepare the release files:** update the version in `DESCRIPTION`, finalize `NEWS.md` and documentation.
+   2. **Perform the [local checks](#local-verification).**
+   3. **Commit the changes:** use `[model.form] Release <version>`, for example `[model.form] Release 0.2.0`.
+   4. **Push the release commit.**
 
-The workflow checks the selected commit, creates its tag and GitHub Release, and uploads the archive and checksum.
+2. **Start the release on GitHub:** open **Actions → Start Release → Run workflow**, select `develop` and run it. The version is read from `DESCRIPTION`. This creates a release branch and opens a pull request to merge it into `main`.
+3. **Merge the release PR:** wait for all checks to be green, then select **Create a merge commit**.
 
-It then deploys the documentation from the same commit.
+**Publish Release** then publishes the versioned package, checksum and documentation automatically.
 
-Verify the workflow and release assets. If publication fails, rerun the failed job.
+Coverage runs automatically on pushes to `main` after the release merge, alongside publication without blocking it.
+
+Run **Actions → Test Coverage → Run workflow** for coverage on demand. Build still runs tests on every push and PR.
 
 ## License
 
