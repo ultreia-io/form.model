@@ -1,4 +1,4 @@
-dialect: model.form/schema/1
+dialect: form.model/schema/1
 contract_version: 1.0.0
 root: model
 definitions:

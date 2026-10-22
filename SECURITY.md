@@ -2,7 +2,7 @@
 
 Version 0.1.x receives security fixes while it is the current release series.
 
-Report vulnerabilities privately through [GitHub advisories](https://github.com/ultreia-io/model.form/security/advisories/new).
+Report vulnerabilities privately through [GitHub advisories](https://github.com/ultreia-io/form.model/security/advisories/new).
 
 If private reporting is unavailable, contact Tony through his GitHub profile before disclosing details publicly.
 

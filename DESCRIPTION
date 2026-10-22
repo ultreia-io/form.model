@@ -1,4 +1,4 @@
-Package: model.form
+Package: form.model
 Title: Neutral Versioned Form Definitions and Workbook Layouts
 Version: 0.1.0
 Authors@R:
@@ -10,9 +10,9 @@ Description: Loads explicit YAML resources describing versioned forms,
     semantic invariants, and provides value-like inspection APIs. Does not
     validate submitted data or connect to external services.
 License: LGPL-2.1
-URL: https://ultreia-io.github.io/model.form/,
-    https://github.com/ultreia-io/model.form
-BugReports: https://github.com/ultreia-io/model.form/issues
+URL: https://ultreia-io.github.io/form.model/,
+    https://github.com/ultreia-io/form.model
+BugReports: https://github.com/ultreia-io/form.model/issues
 Encoding: UTF-8
 Depends: R (>= 4.1.0)
 Imports: yaml (>= 2.3.10)

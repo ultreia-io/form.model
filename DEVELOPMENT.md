@@ -12,7 +12,7 @@ The files organize functions in one package namespace. You do not source each fi
 | `check.R`              | Check definitions and construct checked models. |
 | `inspect.R`            | Retrieve model properties and print summaries.  |
 | `values.R`             | Provide shared field-type checks.               |
-| `model.form-package.R` | Provide package-level documentation.            |
+| `form.model-package.R` | Provide package-level documentation.            |
 
 Loading follows this call sequence:
 
@@ -47,7 +47,7 @@ Rscript -e 'roxygen2::roxygenise(); testthat::test_local()'
 mkdir -p build
 (cd build && R CMD build --no-manual ..)
 package_version=$(Rscript -e 'cat(read.dcf("DESCRIPTION")[1, "Version"])')
-R CMD check --no-manual --output=build "build/model.form_${package_version}.tar.gz"
+R CMD check --no-manual --output=build "build/form.model_${package_version}.tar.gz"
 Rscript tools/build-site.R
 ```
 
@@ -69,7 +69,7 @@ Keep the YAML schema authoritative. Semantic invariants live in R and must have 
 
    1. **Prepare the release files:** update the version in `DESCRIPTION`, finalize `NEWS.md` and documentation.
    2. **Perform the [local checks](#local-verification).**
-   3. **Commit the changes:** use `[model.form] Release <version>`, for example `[model.form] Release 0.2.0`.
+   3. **Commit the changes:** use `[form.model] Release <version>`, for example `[form.model] Release 0.2.0`.
    4. **Push the release commit.**
 
 2. **Start the release on GitHub:** open **Actions → Start Release → Run workflow**, select `develop` and run it. The version is read from `DESCRIPTION`. This creates a release branch and opens a pull request to merge it into `main`.

@@ -94,4 +94,4 @@ Load a file with `read_form_model()` to check its structure and consistency.
 
 Use `check_form_model()` on a definition list to get diagnostics with source, property path and message.
 
-Consistency checks run only after structure passes. Submitted-data validation belongs to `model.validation`.
+Consistency checks run only after structure passes. Submitted-data validation belongs to `form.validation`.

@@ -9,7 +9,7 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(model.form)
+library(form.model)
 ```
 
 
@@ -19,13 +19,13 @@ This guide demonstrates the bundled survey form definition.
 
 You will load the model, inspect its contents, and see how invalid definitions are reported.
 
-This package checks form definitions. Submitted-data validation belongs to `model.validation`.
+This package checks form definitions. Submitted-data validation belongs to `form.validation`.
 
 ## Load an installed example
 
 ```{r}
-library(model.form)
-directory <- system.file("examples", package = "model.form")
+library(form.model)
+directory <- system.file("examples", package = "form.model")
 m <- load_form_model("survey", directory)
 m
 ```
@@ -83,4 +83,4 @@ error$diagnostics
 - [Authoring model definitions](model-authoring.html): create your own form.
 - [Model specification](model-specification.html): field types, constraints and layouts.
 - [Distributing models](downstream-packages.html): use models in another package.
-- [Function reference](https://ultreia-io.github.io/model.form/reference/index.html): API details.
+- [Function reference](https://ultreia-io.github.io/form.model/reference/index.html): API details.

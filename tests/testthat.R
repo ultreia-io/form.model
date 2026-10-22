@@ -1,3 +1,3 @@
 library(testthat)
-library(model.form)
-test_check("model.form")
+library(form.model)
+test_check("form.model")

@@ -1,14 +1,14 @@
 #' Read the model-definition schema
 #' @param version Schema version; currently `"1.0.0"`.
 #' @return The schema as a nested list. Unsupported versions raise `model_form_error`.
-#' @details Uses the package's `model.form/schema/1` dialect, not JSON Schema.
+#' @details Uses the package's `form.model/schema/1` dialect, not JSON Schema.
 #' @examples
 #' form_schema()$contract_version
 #' @export
 form_schema <- function(version = "1.0.0") {
   text_arg(version, "version")
   if (!identical(version, "1.0.0")) abort_model("<schema>", "version", "unsupported schema version")
-  read_yaml_data(form_resource("schema/model-1.0.0.yaml", "model.form"))
+  read_yaml_data(form_resource("schema/model-1.0.0.yaml", "form.model"))
 }
 
 #' Check value attributes
@@ -215,7 +215,7 @@ semantic_check <- function(d, add) {
 }
 
 #' Check a form definition
-#' @param definition Named list following [`form_schema()`][model.form::form_schema]; sequences are unnamed lists.
+#' @param definition Named list following [`form_schema()`][form.model::form_schema]; sequences are unnamed lists.
 #' @param resource Source label for diagnostics.
 #' @return A `form_model_check` with `valid` and a `diagnostics` data frame
 #'   containing `resource`, `path` and `message` columns.
@@ -223,7 +223,7 @@ semantic_check <- function(d, add) {
 #'   Invalid definitions return diagnostics; invalid arguments raise `model_form_error`.
 #'   Submitted data is not checked.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' check_form_model(form_definition(model))
 #' @export
 check_form_model <- function(definition, resource = "<list>") {
@@ -244,7 +244,7 @@ check_form_model <- function(definition, resource = "<list>") {
 #' @return The definition as a `form_model` list, without the source label.
 #'   Invalid definitions raise `model_form_error` with diagnostics.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "model.form")
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
 #' as_form_model(form_definition(model))
 #' @export
 as_form_model <- function(definition, resource = "<list>") {

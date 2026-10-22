@@ -134,7 +134,7 @@ jobs:
         uses: codecov/codecov-action@v7.0.0
         with:
           token: ${{ env.CODECOV_TOKEN }}
-          slug: ultreia-io/model.form
+          slug: ultreia-io/form.model
           files: docs/coverage/coverage.xml
           disable_search: true
           fail_ci_if_error: true
