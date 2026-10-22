@@ -3,7 +3,8 @@
 * Rename the package from `model.form` to `form.model`; update installation references and namespace calls.
 
 * Derive table column counts from the ordered field definitions; remove redundant `layout.column_count` declarations.
-* Simplify installation instructions and guide navigation.
+* Simplify installation instructions and guide navigation; maintain the README directly in Markdown.
+* Introduce release pull requests with manual merging, followed by package and documentation publication.
 
 # model.form 0.1.0
 

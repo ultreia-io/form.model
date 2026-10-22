@@ -1,6 +1,6 @@
 Package: form.model
 Title: Neutral Versioned Form Definitions and Workbook Layouts
-Version: 0.1.0
+Version: 0.2.0
 Authors@R:
     person("Tony", "Chemit", role = c("aut", "cre"),
            email = "tchemit@users.noreply.github.com")
