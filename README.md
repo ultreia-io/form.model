@@ -15,10 +15,6 @@ data.**
 
 ## Installation
 
-From version 0.2.0, `model.form` is named `form.model`. Update `library()` and namespace calls accordingly.
-
-Until 0.2.0 is published, use the development installation below.
-
 Install the latest released version directly from GitHub:
 
 ``` r
