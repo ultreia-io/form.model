@@ -1,10 +1,9 @@
 name: Build
 
-# Check pushes and proposed PR merges. Also callable manually or by Publish Release for a chosen commit.
+# Check development pushes and PRs. Publish Release checks the main merge through workflow_call.
 on:
   push:
     branches:
-      - main
       - develop
       - 'feature/**'
   pull_request:

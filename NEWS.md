@@ -1,3 +1,7 @@
+# form.model 0.3.0
+
+* Fix CI and release automation, including coverage uploads and documentation deployment.
+
 # form.model 0.2.0
 
 * Rename the package from `model.form` to `form.model`; update installation references and namespace calls.
