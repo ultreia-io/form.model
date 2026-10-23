@@ -60,3 +60,12 @@ home:
   sidebar: false
 news:
   cran_dates: false
+
+footer:
+  structure:
+    left: [company, copyright, license]
+    right: built_with
+  components:
+    company: "[ultreia.io](https://ultreia.io/)"
+    copyright: "· © 2026"
+    license: "· [License: LGPL-2.1](https://github.com/ultreia-io/form.model/blob/main/LICENSE)"
