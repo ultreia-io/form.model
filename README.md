@@ -102,7 +102,7 @@ and the resolved defaults above.
   integration](https://ultreia-io.github.io/form.model/articles/downstream-packages.html)
 - [API
   reference](https://ultreia-io.github.io/form.model/reference/index.html)
-- [Contributing](CONTRIBUTING.md) and [maintenance](DEVELOPMENT.md)
+- [Contributing](https://ultreia-io.github.io/form.model/CONTRIBUTING.html) and [maintenance](https://ultreia-io.github.io/form.model/DEVELOPMENT.html)
 
 ## Boundaries
 

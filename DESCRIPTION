@@ -7,7 +7,7 @@ Authors@R:
 Description: Loads explicit YAML resources describing versioned forms,
     fields, declarative constraints, reference requirements, and workbook
     layouts. Checks model definitions against an installed YAML schema and
-    semantic invariants, and provides value-like inspection APIs. Does not
+    consistency rules, and provides value-like inspection APIs. Does not
     validate submitted data or connect to external services.
 License: LGPL-2.1
 URL: https://ultreia-io.github.io/form.model/,
