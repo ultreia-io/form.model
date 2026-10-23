@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/ultreia-io/form.model/actions/workflows/Build.yaml/badge.svg?branch=develop)](https://github.com/ultreia-io/form.model/actions/workflows/Build.yaml?query=branch%3Adevelop)
 [![Test Coverage](https://github.com/ultreia-io/form.model/actions/workflows/TestCoverage.yaml/badge.svg?branch=main)](https://github.com/ultreia-io/form.model/actions/workflows/TestCoverage.yaml?query=branch%3Amain)
+[![Coverage](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fultreia-io.github.io%2Fform.model%2Fcoverage%2Fcoverage.xml&query=round%28%2Fcoverage%2F%40line-rate+%2A+1000%29+div+10&label=coverage&suffix=%25&color=brightgreen)](https://ultreia-io.github.io/form.model/articles/coverage.html)
 [![Website](https://img.shields.io/badge/website-documentation-blue)](https://ultreia-io.github.io/form.model/)
 [![Latest
 release](https://img.shields.io/github/v/release/ultreia-io/form.model?display_name=tag&sort=semver)](https://github.com/ultreia-io/form.model/releases/latest)
@@ -14,10 +15,6 @@ ordered workbook layouts.
 data.**
 
 ## Installation
-
-From version 0.2.0, `model.form` is named `form.model`. Update `library()` and namespace calls accordingly.
-
-Until 0.2.0 is published, use the development installation below.
 
 Install the latest released version directly from GitHub:
 

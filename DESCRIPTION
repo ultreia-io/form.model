@@ -1,9 +1,9 @@
 Package: form.model
 Title: Neutral Versioned Form Definitions and Workbook Layouts
-Version: 0.3.0
+Version: 0.3.1
 Authors@R:
     person("Tony", "Chemit", role = c("aut", "cre"),
-           email = "tchemit@users.noreply.github.com")
+           email = "dev@tchemit.fr")
 Description: Loads explicit YAML resources describing versioned forms,
     fields, declarative constraints, reference requirements, and workbook
     layouts. Checks model definitions against an installed YAML schema and

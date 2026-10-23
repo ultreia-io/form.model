@@ -1,3 +1,11 @@
+# form.model 0.3.1
+
+* Include R documentation in Git tags for direct source installation.
+* Add a README badge showing the published test coverage percentage.
+* Improve the website footer with company, copyright and license links.
+* Use the latest R container in Linux CI and improve website dependency caching.
+* Prepare for CRAN submission with a working maintainer email and the packaged vignette index.
+
 # form.model 0.3.0
 
 * Fix CI and release automation, including coverage uploads and documentation deployment.
