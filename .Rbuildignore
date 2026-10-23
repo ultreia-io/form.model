@@ -16,5 +16,5 @@
 ^lib$
 ^README\.html$
 ^\.idea$
-^build$
+^build/(?!vignette\.rds$).*
 ^vignettes/articles$
