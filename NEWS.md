@@ -1,3 +1,7 @@
+# form.model 0.3.2
+
+* Fix README documentation links and clarify the package description for CRAN checks.
+
 # form.model 0.3.1
 
 * Include R documentation in Git tags for direct source installation.
