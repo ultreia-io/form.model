@@ -43,7 +43,7 @@ scalar_type <- function(x, type) {
 #' @keywords internal
 schema_check <- function(x, node, definitions, path, add) {
   while (!is.null(node$ref)) node <- definitions[[node$ref]]
-  if (!is.null(node$shorthand) && !is.list(x)) {
+  if (!is.null(node$shorthand) && (!is.list(x) || is.null(names(x)))) {
     return(schema_check(x, node$shorthand, definitions, path, add))
   }
   type <- node$type
@@ -94,10 +94,18 @@ schema_check <- function(x, node, definitions, path, add) {
 #'   passed to `add`.
 #' @keywords internal
 semantic_check <- function(d, add) {
-  references <- unlist(d$references, use.names = FALSE)
-  for (i in which(duplicated(references))) {
-    add(paste0("$.references[", i, "]"), paste0("duplicate reference: ", references[[i]]))
+  reference_groups <- !is.null(names(d$references))
+  code_lists <- unlist(if (reference_groups) d$references$code_lists else d$references, use.names = FALSE)
+  code_list_path <- if (reference_groups) "references.code_lists" else "references"
+  registries <- unlist(if (reference_groups) d$references$registries else NULL, use.names = FALSE)
+  for (i in which(duplicated(code_lists))) {
+    add(paste0("$.", code_list_path, "[", i, "]"), paste0("duplicate code list: ", code_lists[[i]]))
   }
+  for (i in which(duplicated(registries))) {
+    add(paste0("$.references.registries[", i, "]"), paste0("duplicate registry: ", registries[[i]]))
+  }
+  for (id in intersect(code_lists, registries))
+    add("$.references.registries", paste0("ID is also a code list: ", id))
   sheet_names <- names(d$sheets)
   if (anyDuplicated(tolower(sheet_names))) add("$.sheets", "duplicate workbook sheet names (case insensitive)")
   for (sheet_index in seq_along(d$sheets)) {
@@ -160,19 +168,21 @@ semantic_check <- function(d, add) {
         }, error = function(e) FALSE)
         if (!pattern_ok) add(paste0(field_path, ".pattern"), "invalid PCRE regular expression")
       }
-      if (!is.null(constraints$reference)) {
-        reference <- constraints$reference
-        reference_path <- paste0(field_path, ".reference")
-        if (is.list(reference)) {
-          reference <- reference$id
-          reference_path <- paste0(reference_path, ".id")
-        }
-        if (!reference %in% references) {
-          add(reference_path, paste0("unknown reference: ", reference))
-        }
-        if (field$type != "string") {
-          add(reference_path, "reference constraints require a string field")
-        }
+      if (!is.null(constraints$reference) && !is.null(constraints$code_list))
+        add(field_path, "use code_list instead of reference")
+      for (kind in c("reference", "code_list", "registry")) {
+        use <- constraints[[kind]]
+        if (is.null(use)) next
+        id <- if (is.list(use)) use$id else use
+        path <- paste0(field_path, ".", kind, if (is.list(use)) ".id" else "")
+        declared <- if (kind == "registry") registries else code_lists
+        if (!id %in% declared) add(path, paste0("unknown ", kind, ": ", id))
+        if (!field$type %in% if (kind == "reference") "string" else c("string", "email"))
+          add(path, if (kind == "reference") "reference constraints require a string field" else
+            paste0(kind, " constraints require a string or email field"))
+        if (kind == "registry" && is.list(use) && identical(use$matching, "name") &&
+            field$type != "string")
+          add(path, "registry name matching requires a string field")
       }
       dependency <- field$required_field
       if (!is.null(dependency)) {

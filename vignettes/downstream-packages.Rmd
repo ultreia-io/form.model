@@ -50,7 +50,8 @@ The bundled example uses exactly the same installed-resource mechanism.
 path <- form_resource("examples/survey-form.yaml", "form.model")
 stopifnot(file.exists(path))
 m <- select_form_model(path, "survey", "2026.1")
-form_references(m)
+form_code_lists(m)
+form_registries(m)
 ```
 
 Selection reads only supplied paths, validates all of them, and requires exactly one matching identity tuple.
@@ -65,14 +66,15 @@ Package-relative paths cannot escape the installed package, including through sy
 form_fields(m, sheet = "Observations")
 form_layout(m, id = "Observations")
 form_field(m, id = "Metadata.submission")[c("row", "column")]
-form_references(m)
+form_code_lists(m)
+form_registries(m)
 ```
 
 Fields retain declaration order; coordinates are one-based. Field IDs use `<sheet>.<field>`.
 
 Accessors expose declarations without executing constraints or loading reference data.
 
-See `?form_fields`, `?form_field`, `?form_layout` and `?form_references` for details.
+See `?form_fields`, `?form_field`, `?form_layout`, `?form_code_lists` and `?form_registries` for details.
 
 ## Pass models and dependencies explicitly
 

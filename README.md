@@ -63,8 +63,7 @@ select_form_model(
 - Independent schema and form versions.
 - Ordered sheets, fields, fixed cells, and table columns.
 - Explicit types and compact constraints, including `mandatory`.
-- Declarative references supplied by callers; no embedded domain
-  reference data.
+- Separate code-list and registry declarations; callers supply their data.
 - Structured definition diagnostics and ordinary list/S3 values.
 - One runtime dependency: `yaml`. Loading the package has no external
   side effects.
@@ -76,7 +75,7 @@ These omitted properties receive values from `form.model`:
 | Model YAML                   | Effective meaning                                                             |
 |------------------------------|-------------------------------------------------------------------------------|
 | `mandatory` omitted          | The field may be absent or null; `form_fields()` returns `mandatory = FALSE`. |
-| Reference `severity` omitted | An unknown code is an error; `form_fields()` returns `severity = "error"`.    |
+| `severity` omitted           | An unmatched code or registry value is an error.                              |
 
 Table column counts are derived from the fields. Other omissions do not invent values.
 
@@ -91,6 +90,12 @@ inside all declared dimensions.
 `form_sheets()` and `form_layout()` expose the derived table column counts.
 `form_fields()` returns effective fields with derived full IDs, columns,
 and the resolved defaults above.
+
+Declare code-list IDs under `references.code_lists` and registry IDs under `references.registries`.
+Use `code_list` or `registry` on a field to bind it to a declared ID.
+Registry bindings may specify `matching: name`, `aliases`, and `severity`.
+Each registry binding selects a `column` from its declared table.
+Inspect the declarations with `form_code_lists()` and `form_registries()`.
 
 ## Guides
 

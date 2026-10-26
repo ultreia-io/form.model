@@ -15,7 +15,8 @@ reference:
       - form_field
       - form_sheets
       - form_layout
-      - form_references
+      - form_code_lists
+      - form_registries
       - print.form_model
       - print.form_model_check
 articles:

@@ -46,7 +46,7 @@ A `form_model` is the checked definition itself, with an S3 class:
 names(m)
 ```
 
-It directly contains the form identity, versions, references, and sheets.
+It directly contains the form identity, versions, reference declarations, and sheets.
 
 Sheets use worksheet names, and their fields use local field names:
 
@@ -64,7 +64,7 @@ The S3 class selects the compact `print()` method shown above. It does not make 
 
 ```{r}
 d <- form_definition(m)
-d$sheets[[2]]$fields[[1]]$reference <- "missing"
+d$sheets[[2]]$fields[[1]]$code_list <- "missing"
 result <- check_form_model(d, resource = "my-definition.yaml")
 result$diagnostics
 stopifnot(!result$valid)

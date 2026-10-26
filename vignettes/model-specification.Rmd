@@ -33,7 +33,8 @@ Optional constraints are:
 - `minimum`, `maximum`: inclusive numeric bounds; integer bounds must be whole numbers.
 - `pattern`: a PCRE regular expression for string, email, date or datetime fields.
 - `unique`: requires distinct values within a repeated table field.
-- `reference`: a code-list ID declared in the model's `references` list; valid only for string fields.
+- `code_list`: an ID declared under `references.code_lists` for a string or email field.
+- `registry`: an ID declared under `references.registries` for a string or email field.
 
 Enums are constraints, not a separate type. Quote numeric-looking string codes: `enum: ["01", "02"]`.
 
@@ -43,9 +44,27 @@ In tables, this applies within the same row. A field cannot depend on itself; mu
 
 The condition still permits a unit when length is empty.
 
-References default to error severity. Use `reference: {id: observers, severity: warning}` for warnings.
+Both bindings default to error severity. Use `code_list: {id: observers, severity: warning}` for a warning.
 
-The model declares reference names only. Callers supply the code lists when validating submitted data.
+For registries, use `registry: {id: contacts, column: email, severity: warning}`.
+Matching defaults to `exact`; `name` requires a string field.
+Registry aliases belong to the supplied registry snapshot, not the form field.
+
+For example, declare the registry under `references`, then bind a string field:
+
+```yaml
+references:
+  registries: [contacts]
+```
+
+The field declaration is:
+
+```yaml
+contact_email: {location: C4, type: email, registry: {id: contacts, column: email, severity: warning}}
+```
+
+The model declares IDs and matching policy, but carries no reference data.
+Callers supply code-list and registry snapshots when validating submitted data.
 
 See `?form_fields` for the effective field properties returned by accessors.
 

@@ -6,10 +6,10 @@ test_that("installed resources and ordered accessors work independently of cwd",
   expect_identical(names(form_fields(m, "Metadata")),
                    c("Metadata.submission", "Metadata.date", "Metadata.contact_email", "Metadata.comment"))
   expect_identical(names(form_sheets(m)), c("Metadata", "Observations"))
-  expect_identical(form_references(m), c("observers", "stations"))
+  expect_identical(form_code_lists(m), c("observers", "stations"))
   expect_identical(form_layout(m, "Observations")$start_row, 6L)
   expect_identical(form_field(m, "Observations.unit")$enum, list("cm", "m"))
-  expect_identical(form_field(m, "Observations.station")$reference$severity, "error")
+  expect_identical(form_field(m, "Observations.station")$code_list$severity, "error")
   expect_identical(form_metadata(m)$schema_version, "1.0.0")
   expect_identical(form_metadata(m)$form$version, "2026.1")
   expect_output(print(m), "survey @ 2026.1")
@@ -25,11 +25,11 @@ test_that("compact declarations expose effective field values", {
   m <- example_model()
   expect_identical(names(m$sheets$Metadata$fields), c("submission", "date", "contact_email", "comment"))
   expect_false("mandatory" %in% names(m$sheets$Metadata$fields$comment))
-  expect_identical(m$sheets$Observations$fields$station$reference, "stations")
+  expect_identical(m$sheets$Observations$fields$station$code_list, "stations")
   expect_false(form_field(m, "Metadata.comment")$mandatory)
   expect_true(form_field(m, "Metadata.submission")$mandatory)
   expect_identical(form_field(m, "Observations.count")$column, 2L)
-  expect_identical(form_field(m, "Observations.station")$reference$severity, "error")
+  expect_identical(form_field(m, "Observations.station")$code_list$severity, "error")
 
   d <- form_definition(m)
   d$form$version <- "2026.2"
@@ -92,16 +92,16 @@ test_that("hidden mutable attributes cannot enter model values", {
   expect_bad(d, ".type", "expected string")
 })
 
-test_that("reference shorthand preserves declarations and resolves severity", {
+test_that("code-list shorthand preserves declarations and resolves severity", {
   compact <- example_model()
   d <- form_definition(compact)
-  d$sheets$Observations$fields$station$reference <- list(id = "stations", severity = "error")
+  d$sheets$Observations$fields$station$code_list <- list(id = "stations", severity = "error")
   expect_identical(form_fields(compact), form_fields(as_form_model(d)))
-  d$sheets$Observations$fields$station$reference$severity <- "warning"
-  expect_identical(form_field(as_form_model(d), "Observations.station")$reference,
+  d$sheets$Observations$fields$station$code_list$severity <- "warning"
+  expect_identical(form_field(as_form_model(d), "Observations.station")$code_list,
                    list(id = "stations", severity = "warning"))
   expect_identical(form_definition(compact)$sheets$Observations$fields$station,
-                   list(mandatory = TRUE, type = "string", reference = "stations"))
+                   list(mandatory = TRUE, type = "string", code_list = "stations"))
 })
 
 test_that("cell locations decode across column letter boundaries", {

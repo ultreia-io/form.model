@@ -55,6 +55,26 @@ definitions:
         enum:
         - error
         - warning
+  registry_use:
+    type: mapping
+    required:
+    - id
+    - column
+    properties:
+      id:
+        ref: id
+      column:
+        ref: id
+      matching:
+        type: string
+        enum:
+        - exact
+        - name
+      severity:
+        type: string
+        enum:
+        - error
+        - warning
   field:
     type: mapping
     required:
@@ -84,6 +104,10 @@ definitions:
         ref: boolean
       reference:
         ref: reference_use
+      code_list:
+        ref: reference_use
+      registry:
+        ref: registry_use
   fields:
     type: mapping
     key_pattern: ^[A-Za-z][A-Za-z0-9_.-]*$
@@ -127,6 +151,19 @@ definitions:
     values:
       ref: sheet
     min_items: 1
+  reference_ids:
+    type: sequence
+    items:
+      ref: id
+    min_items: 0
+  references:
+    shorthand: {ref: reference_ids}
+    type: mapping
+    properties:
+      code_lists:
+        ref: reference_ids
+      registries:
+        ref: reference_ids
   model:
     type: mapping
     required:
@@ -142,9 +179,6 @@ definitions:
       form:
         ref: form
       references:
-        type: sequence
-        items:
-          ref: id
-        min_items: 0
+        ref: references
       sheets:
         ref: sheets

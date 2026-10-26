@@ -25,15 +25,15 @@ test_that("schema rejects missing, unsupported and mistyped properties", {
   expect_bad(d, ".location", "pattern")
 })
 
-test_that("mapping keys and reference requirements are linked", {
-  d <- definition(); d$references <- c(d$references, d$references[1])
-  expect_bad(d, "$.references", "duplicate reference")
+test_that("mapping keys and code-list requirements are linked", {
+  d <- definition(); d$references$code_lists <- c(d$references$code_lists, d$references$code_lists[1])
+  expect_bad(d, "$.references.code_lists", "duplicate code list")
   d <- definition(); names(d$sheets)[2] <- "metadata"
   expect_bad(d, "$.sheets", "duplicate workbook")
-  d <- definition(); d$sheets[[2]]$fields[[1]]$reference <- "absent"
-  expect_bad(d, ".reference", "unknown reference")
-  d <- definition(); d$sheets[[2]]$fields[[2]]$reference <- list(id = "stations")
-  expect_bad(d, ".reference.id", "string field")
+  d <- definition(); d$sheets[[2]]$fields[[1]]$code_list <- "absent"
+  expect_bad(d, ".code_list", "unknown code_list")
+  d <- definition(); d$sheets[[2]]$fields[[2]]$code_list <- list(id = "stations")
+  expect_bad(d, ".code_list.id", "string or email field")
   d <- definition(); d$sheets[[2]]$fields[[4]]$required_field <- "absent"
   expect_bad(d, ".required_field", "unknown field")
   d <- definition(); d$sheets[[2]]$fields[[4]]$required_field <- "unit"
@@ -107,12 +107,12 @@ test_that("temporal enum values must be text", {
 test_that("compact constraints reject invalid declarations", {
   d <- definition(); d$sheets$Metadata$fields$comment$constraints <- list(mandatory = TRUE)
   expect_bad(d, ".constraints", "unsupported property")
-  for (reference in list("bad id", "", TRUE, 42, list(id = "stations", severity = "notice"))) {
-    d <- definition(); d$sheets$Observations$fields$station$reference <- reference
+  for (code_list in list("bad id", "", TRUE, 42, list(id = "stations", severity = "notice"))) {
+    d <- definition(); d$sheets$Observations$fields$station$code_list <- code_list
     expect_false(check_form_model(d)$valid)
   }
-  d <- definition(); d$sheets$Observations$fields$station$reference <- list(id = "missing")
-  expect_bad(d, ".reference.id", "unknown reference")
+  d <- definition(); d$sheets$Observations$fields$station$code_list <- list(id = "missing")
+  expect_bad(d, ".code_list.id", "unknown code_list")
 })
 
 test_that("locations are single uppercase A1 addresses", {

@@ -4,16 +4,18 @@
 #'   otherwise raises `model_form_error`. Does not recheck the definition.
 #' @keywords internal
 model_arg <- function(model) {
-  required <- c("schema_version", "form", "references", "sheets")
+  required <- c("schema_version", "form", "sheets")
   if (!inherits(model, "form_model") || !is.list(model) ||
-      !all(required %in% names(model))) {
+      !all(required %in% names(model)) ||
+      !"references" %in% names(model)) {
     abort_model("<argument>", "model", "expected a form_model; use as_form_model()")
   }
 }
 
 #' Get the complete definition
 #' @param model A checked `form_model` from [`read_form_model()`][form.model::read_form_model] or [`as_form_model()`][form.model::as_form_model].
-#' @return An ordinary list with `schema_version`, `form`, `references` and `sheets`.
+#' @return An ordinary model definition with `form`, `sheets`, and
+#'   `references` containing declared `code_lists` and `registries`.
 #' @details Accessors preserve declaration order and do not revalidate models.
 #'   Treat checked models as read-only. Invalid model arguments raise `model_form_error`.
 #' @examples
@@ -42,8 +44,8 @@ form_metadata <- function(model) {
 #' @param sheet Exact worksheet name, or `NULL` for all sheets.
 #' @return Field definitions named `<sheet>.<field>`. Unknown sheets raise `model_form_error`.
 #' @details Adds field IDs, names, sheet names and numeric coordinates.
-#'   Omitted `mandatory` becomes `FALSE`; reference shorthand becomes a mapping
-#'   with severity `"error"` when omitted. Other undeclared properties stay absent.
+#'   Omitted `mandatory` becomes `FALSE`; code-list and registry shorthand become
+#'   mappings. Severity defaults to `"error"`; registry matching defaults to `"exact"`.
 #'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
 #' model <- read_form_model("examples/survey-form.yaml", "form.model")
@@ -71,12 +73,13 @@ form_fields <- function(model, sheet = NULL) {
         field$row <- cell$row
         field$column <- cell$column
       }
-      if (is.character(field$reference)) {
-        field$reference <- list(id = field$reference)
+      for (kind in c("reference", "code_list", "registry")) {
+        if (is.character(field[[kind]])) field[[kind]] <- list(id = field[[kind]])
+        if (!is.null(field[[kind]]) && is.null(field[[kind]]$severity))
+          field[[kind]]$severity <- "error"
       }
-      if (!is.null(field$reference) && is.null(field$reference$severity)) {
-        field$reference$severity <- "error"
-      }
+      if (!is.null(field$registry) && is.null(field$registry$matching))
+        field$registry$matching <- "exact"
       result[[field$id]] <- field
     }
   }
@@ -136,14 +139,27 @@ form_layout <- function(model, id) {
   sheets[[id]]$layout
 }
 
-#' Get reference requirements
+#' Get code-list requirements
 #' @inheritParams form_definition
-#' @return Declared reference names. Reference data is not loaded.
+#' @return Declared code-list names. Reference data is not loaded.
 #' @examples
 #' model <- read_form_model("examples/survey-form.yaml", "form.model")
-#' form_references(model)
+#' form_code_lists(model)
 #' @export
-form_references <- function(model) unlist(form_definition(model)$references, use.names = FALSE)
+form_code_lists <- function(model) {
+  d <- form_definition(model)
+  refs <- d$references
+  unlist(if (is.null(names(refs))) refs else refs$code_lists, use.names = FALSE)
+}
+
+#' Get registry requirements
+#' @inheritParams form_definition
+#' @return Declared registry table names. This does not load registry data.
+#' @examples
+#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' form_registries(model)
+#' @export
+form_registries <- function(model) unlist(form_definition(model)$references$registries, use.names = FALSE)
 
 #' Print a model summary
 #' @param x A checked `form_model`.
