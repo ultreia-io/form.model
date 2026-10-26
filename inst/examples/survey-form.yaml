@@ -3,8 +3,11 @@ form:
   id: survey
   version: '2026.1'
 references:
-- observers
-- stations
+  code_lists:
+    - observers
+    - stations
+  registries:
+    - contacts
 sheets:
   # Fixed cells with an exact physical sheet size.
   Metadata:
@@ -12,13 +15,14 @@ sheets:
     fields:
       submission: {mandatory: true, location: C2, type: string, pattern: '^[0-9]{3}$'}
       date: {mandatory: true, location: C3, type: date}
-      contact_email: {location: C4, type: email}
+      contact_email: {location: C4, type: email, registry: {id: contacts, column: email, severity: warning}}
       comment: {location: C5, type: string}
   # Repeated rows; field declaration order determines column order.
   Observations:
     layout: {kind: table, start_row: 6}
+    primary_key: [station, observation_id]
     fields:
-      station: {mandatory: true, type: string, reference: stations}
+      station: {mandatory: true, type: string, code_list: stations}
       count: {mandatory: true, type: integer, minimum: 0, maximum: 1000}
       length: {type: number, minimum: 0}
       unit: {type: string, required_field: length, enum: [cm, m]}
@@ -26,6 +30,6 @@ sheets:
       observed_at: {type: datetime}
       latitude: {type: latitude}
       longitude: {type: longitude}
-      observation_id: {type: string, pattern: '^OBS-[0-9]{3}$', unique: true}
+      observation_id: {type: string, pattern: '^OBS-[0-9]{3}$'}
       quality: {type: integer, enum: [1, 2, 3]}
-      observer: {type: string, reference: {id: observers, severity: warning}}
+      observer: {type: string, code_list: {id: observers, severity: warning}}
