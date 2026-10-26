@@ -10,7 +10,8 @@ form_definition(model)
 \item{model}{A checked \code{form_model} from \code{\link[=read_form_model]{read_form_model()}} or \code{\link[=as_form_model]{as_form_model()}}.}
 }
 \value{
-An ordinary list with \code{schema_version}, \code{form}, \code{references} and \code{sheets}.
+An ordinary model definition with \code{form}, \code{sheets}, and
+\code{references} containing declared \code{code_lists} and \code{registries}.
 }
 \description{
 Get the complete definition

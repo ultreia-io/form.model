@@ -1,3 +1,9 @@
+# form.model 0.4.0
+
+* Declare and inspect primary keys for table sheets.
+* Group code lists and registry tables under form references, with a column selected by each registry field.
+* Fix README documentation links and clarify the package description for CRAN checks.
+
 # form.model 0.3.1
 
 * Include R documentation in Git tags for direct source installation.

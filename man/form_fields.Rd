@@ -19,8 +19,8 @@ Get fields in declaration order
 }
 \details{
 Adds field IDs, names, sheet names and numeric coordinates.
-Omitted \code{mandatory} becomes \code{FALSE}; reference shorthand becomes a mapping
-with severity \code{"error"} when omitted. Other undeclared properties stay absent.
+Omitted \code{mandatory} becomes \code{FALSE}; code-list and registry shorthand become
+mappings. Severity defaults to \code{"error"}; registry matching defaults to \code{"exact"}.
 Use \code{\link[=form_definition]{form_definition()}} for the original declarations.
 }
 \examples{

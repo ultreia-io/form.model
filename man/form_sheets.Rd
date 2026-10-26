@@ -17,6 +17,9 @@ Get sheet definitions
 }
 \details{
 Table layouts include \code{column_count} derived from the ordered fields.
+An optional \code{primary_key} preserves the declared sequence of local field names.
+Key components must be filled and their combination must identify one row;
+this package checks the declaration, not submitted values.
 Use \code{\link[=form_definition]{form_definition()}} for the original declarations.
 }
 \examples{
