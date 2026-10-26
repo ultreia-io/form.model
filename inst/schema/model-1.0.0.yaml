@@ -114,6 +114,11 @@ definitions:
     properties:
       layout:
         ref: layout
+      primary_key:
+        type: sequence
+        items:
+          ref: id
+        min_items: 1
       fields:
         ref: fields
   sheets:

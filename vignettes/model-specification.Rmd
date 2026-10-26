@@ -53,7 +53,7 @@ See `?form_fields` for the effective field properties returned by accessors.
 
 `sheets` is an ordered mapping of worksheet names. Every declared sheet is required; names are unique ignoring case.
 
-Each sheet has a `layout` followed by `fields`, keyed by local field name.
+Each sheet has a `layout`, an optional `primary_key`, and `fields`, keyed by local field name.
 
 - `kind: cells`: requires `column_count`. Each field needs a unique uppercase A1 `location`, such as `E3`.
 - `kind: table`: requires `start_row`. Field order defines columns; omit field `location` and layout `column_count`.
@@ -65,6 +65,26 @@ Rows before `start_row` are preamble.
 An optional `row_count` declares the exact physical row count. Fixed locations must fit declared dimensions.
 
 Coordinates are one-based. An empty sheet can declare `fields: {}`; an empty table derives a column count of zero.
+
+## Primary keys
+
+A table can declare one field or an ordered combination of fields as its primary key:
+
+```yaml
+primary_key: [station, observation_id]
+```
+
+Every component must be filled; the combination identifies one row within that sheet of a submitted form.
+
+Individual components may repeat in a composite key. Field-level `unique` still means individual uniqueness.
+
+Use local field names. Keys must be nonempty, contain no repeated fields, and reference declared table fields.
+
+Omit `primary_key` when no key is defined. Fixed-cell sheets cannot declare a primary key.
+
+`form_sheets()` and `form_definition()` retain the declaration without changing field constraints.
+
+This package checks key definitions. Checking submitted key values belongs to the validation package.
 
 ## YAML conventions
 

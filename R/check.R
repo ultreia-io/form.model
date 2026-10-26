@@ -121,6 +121,16 @@ semantic_check <- function(d, add) {
     }
     locations <- character()
     field_names <- names(sheet$fields)
+    if (!is.null(sheet$primary_key)) {
+      key_path <- paste0("$.sheets.", sheet_name, ".primary_key")
+      if (!table) add(key_path, "primary key requires a table layout")
+      key <- unlist(sheet$primary_key, use.names = FALSE)
+      for (i in seq_along(key)) {
+        path <- paste0(key_path, "[", i, "]")
+        if (!key[[i]] %in% field_names) add(path, paste0("unknown field: ", key[[i]]))
+        if (duplicated(key)[[i]]) add(path, paste0("duplicate primary key field: ", key[[i]]))
+      }
+    }
     for (field_index in seq_along(sheet$fields)) {
       field_name <- field_names[[field_index]]
       field <- sheet$fields[[field_index]]

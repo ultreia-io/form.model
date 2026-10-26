@@ -102,6 +102,9 @@ form_field <- function(model, id) {
 #' @inheritParams form_definition
 #' @return Sheets in declaration order, named by worksheet, each with `fields` and `layout`.
 #' @details Table layouts include `column_count` derived from the ordered fields.
+#'   An optional `primary_key` preserves the declared sequence of local field names.
+#'   Key components must be filled and their combination must identify one row;
+#'   this package checks the declaration, not submitted values.
 #'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
 #' model <- read_form_model("examples/survey-form.yaml", "form.model")

@@ -117,7 +117,7 @@ test_that("cell locations decode across column letter boundaries", {
     expect_false(any(c("row", "column", "constraints") %in% names(d$sheets$Metadata$fields$submission)))
   }
   expect_true(all(vapply(form_sheets(example_model()), function(sheet) {
-    identical(names(sheet), c("layout", "fields"))
+    identical(setdiff(names(sheet), "primary_key"), c("layout", "fields"))
   }, logical(1))))
 })
 
