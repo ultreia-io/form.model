@@ -196,6 +196,17 @@ semantic_check <- function(d, add) {
         if (maximum_field == field_name)
           add(path, "field cannot be its own maximum_field")
       }
+      if (!is.null(field$sequence)) {
+        path <- paste0(field_path, ".sequence")
+        if (!table) add(path, "sequence requires a table layout")
+        if (!field$type %in% c("integer", "string"))
+          add(path, "sequence requires an integer or string field")
+        groups <- unlist(field$sequence$group_by, use.names = FALSE)
+        if (anyDuplicated(groups)) add(path, "duplicate sequence grouping fields")
+        for (name in setdiff(groups, field_names))
+          add(path, paste0("unknown grouping field: ", name))
+        if (field_name %in% groups) add(path, "sequence cannot group by itself")
+      }
       pattern_ok <- TRUE
       if (!is.null(constraints$pattern)) {
         if (!field$type %in% c("string", "email", "date", "datetime")) {
