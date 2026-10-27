@@ -31,6 +31,7 @@ Optional constraints are:
 - `required_field`: requires a value when the named field on the same sheet is filled.
 - `enum`: a nonempty list of distinct, non-null values matching the type, bounds and pattern.
 - `minimum`, `maximum`: inclusive numeric bounds; integer bounds must be whole numbers.
+- `maximum_field`: the value must not exceed the named numeric field on the same sheet; compare only valid, present values.
 - `pattern`: a PCRE regular expression for string, email, date or datetime fields.
 - `unique`: requires distinct values within a repeated table field.
 - `code_list`: an ID declared under `references.code_lists` for a string or email field.

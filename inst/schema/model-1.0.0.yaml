@@ -98,6 +98,8 @@ definitions:
         ref: number
       maximum:
         ref: number
+      maximum_field:
+        ref: id
       pattern:
         ref: text
       unique:

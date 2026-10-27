@@ -156,6 +156,20 @@ semantic_check <- function(d, add) {
           add(field_path, "integer bounds must be whole numbers")
         }
       }
+      maximum_field <- field$maximum_field
+      if (!is.null(maximum_field)) {
+        path <- paste0(field_path, ".maximum_field")
+        numeric_types <- c("integer", "number", "latitude", "longitude")
+        if (!field$type %in% numeric_types)
+          add(path, "maximum_field requires a numeric field")
+        if (!maximum_field %in% field_names) {
+          add(path, paste0("unknown field: ", maximum_field))
+        } else if (!sheet$fields[[maximum_field]]$type %in% numeric_types) {
+          add(path, "maximum_field must reference a numeric field")
+        }
+        if (maximum_field == field_name)
+          add(path, "field cannot be its own maximum_field")
+      }
       pattern_ok <- TRUE
       if (!is.null(constraints$pattern)) {
         if (!field$type %in% c("string", "email", "date", "datetime")) {
