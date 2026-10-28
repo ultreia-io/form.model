@@ -5,14 +5,19 @@ test_that("installed resources and ordered accessors work independently of cwd",
   expect_true(check_form_model(form_definition(m))$valid)
   expect_identical(names(form_fields(m, "Metadata")),
                    c("Metadata.submission", "Metadata.date", "Metadata.contact_email", "Metadata.comment"))
-  expect_identical(names(form_sheets(m)), c("Metadata", "Observations"))
+  expect_identical(names(form_sheets(m)), c("Metadata", "Observations", "Samples", "Measurements", "Equipment"))
   expect_identical(form_code_lists(m), c("observers", "stations"))
   expect_identical(form_layout(m, "Observations")$start_row, 6L)
   expect_identical(form_field(m, "Observations.unit")$enum, list("cm", "m"))
   expect_identical(form_field(m, "Observations.station")$code_list$severity, "error")
+  expect_identical(form_sheets(m)$Samples$parent_key$sheet, "Observations")
+  expect_identical(form_sheets(m)$Measurements$parent_key$sheet, "Samples")
+  expect_identical(form_field(m, "Samples.minimum_length")$maximum_field, "maximum_length")
+  expect_identical(form_field(m, "Samples.sample_no")$sequence$start, 1L)
+  expect_true(form_field(m, "Equipment.serial")$unique)
   expect_identical(form_metadata(m)$schema_version, "1.0.0")
-  expect_identical(form_metadata(m)$form$version, "2026.1")
-  expect_output(print(m), "survey @ 2026.1")
+  expect_identical(form_metadata(m)$form$version, "2026.2")
+  expect_output(print(m), "survey @ 2026.2")
   expect_output(print(check_form_model(form_definition(m))), "valid")
   expect_output(print(check_form_model(list())), "invalid")
   expect_error(form_fields(m, "absent"), "unknown sheet")
@@ -32,10 +37,10 @@ test_that("compact declarations expose effective field values", {
   expect_identical(form_field(m, "Observations.station")$code_list$severity, "error")
 
   d <- form_definition(m)
-  d$form$version <- "2026.2"
+  d$form$version <- "2026.3"
   revised <- as_form_model(d)
-  expect_identical(form_metadata(revised)$form$version, "2026.2")
-  expect_identical(form_metadata(m)$form$version, "2026.1")
+  expect_identical(form_metadata(revised)$form$version, "2026.3")
+  expect_identical(form_metadata(m)$form$version, "2026.2")
   schema <- form_schema()
   schema$contract_version <- "changed"
   expect_identical(form_schema()$contract_version, "1.0.0")
@@ -44,14 +49,14 @@ test_that("compact declarations expose effective field values", {
 
 test_that("selection requires exact form identity and rejects ambiguity", {
   path <- example_path()
-  expect_identical(select_form_model(path, "survey", "2026.1"), example_model())
-  expect_s3_class(select_form_model("examples/survey-form.yaml", "survey", "2026.1", "form.model"), "form_model")
-  expect_error(select_form_model(path, "Survey", "2026.1"), "matched 0")
+  expect_identical(select_form_model(path, "survey", "2026.2"), example_model())
+  expect_s3_class(select_form_model("examples/survey-form.yaml", "survey", "2026.2", "form.model"), "form_model")
+  expect_error(select_form_model(path, "Survey", "2026.2"), "matched 0")
   expect_error(select_form_model(path, "survey", "2026"), "matched 0")
-  expect_error(select_form_model(c(path, path), "survey", "2026.1"), "matched 2")
+  expect_error(select_form_model(c(path, path), "survey", "2026.2"), "matched 2")
   expect_error(select_form_model(character(), "x", "1"), "paths")
   expect_error(select_form_model(path, "survey", 1), "version")
-  expect_error(select_form_model(c(path, yaml_file("invalid")), "survey", "2026.1"), "expected mapping")
+  expect_error(select_form_model(c(path, yaml_file("invalid")), "survey", "2026.2"), "expected mapping")
 })
 
 test_that("resources and argument errors are explicit", {
@@ -117,7 +122,7 @@ test_that("cell locations decode across column letter boundaries", {
     expect_false(any(c("row", "column", "constraints") %in% names(d$sheets$Metadata$fields$submission)))
   }
   expect_true(all(vapply(form_sheets(example_model()), function(sheet) {
-    identical(setdiff(names(sheet), "primary_key"), c("layout", "fields"))
+    identical(setdiff(names(sheet), c("primary_key", "parent_key")), c("layout", "fields"))
   }, logical(1))))
 })
 

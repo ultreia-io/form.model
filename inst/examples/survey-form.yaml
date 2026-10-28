@@ -1,7 +1,7 @@
 schema_version: 1.0.0
 form:
   id: survey
-  version: '2026.1'
+  version: '2026.2'
 references:
   code_lists:
     - observers
@@ -33,3 +33,31 @@ sheets:
       observation_id: {type: string, pattern: '^OBS-[0-9]{3}$'}
       quality: {type: integer, enum: [1, 2, 3]}
       observer: {type: string, code_list: {id: observers, severity: warning}}
+  Samples:
+    layout: {kind: table, start_row: 6}
+    primary_key: [station, observation_id, sample_no]
+    parent_key: {sheet: Observations, fields: [station, observation_id]}
+    fields:
+      station: {mandatory: true, type: string}
+      observation_id: {mandatory: true, type: string}
+      sample_no: {mandatory: true, type: integer, sequence: {start: 1, group_by: [station, observation_id]}}
+      minimum_length: {type: number, minimum: 0, maximum_field: maximum_length}
+      maximum_length: {type: number, minimum: 0}
+      unit: {type: string, required_field: minimum_length, enum: [cm, m]}
+  Measurements:
+    layout: {kind: table, start_row: 6}
+    primary_key: [station, observation_id, sample_no, reading_no]
+    parent_key: {sheet: Samples, fields: [station, observation_id, sample_no]}
+    fields:
+      station: {mandatory: true, type: string}
+      observation_id: {mandatory: true, type: string}
+      sample_no: {mandatory: true, type: integer}
+      reading_no: {mandatory: true, type: integer, sequence: {start: 1, group_by: [station, observation_id, sample_no]}}
+      value: {mandatory: true, type: number, minimum: 0}
+  Equipment:
+    layout: {kind: table, start_row: 6}
+    primary_key: [equipment_id]
+    fields:
+      equipment_id: {mandatory: true, type: string}
+      serial: {mandatory: true, type: string, unique: true}
+      label: {mandatory: true, type: string}
