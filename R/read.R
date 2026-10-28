@@ -179,7 +179,7 @@ load_form_model <- function(name, directory) {
 #' @return The matching `form_model`. All files are checked; invalid files or
 #'   anything other than one match raise `model_form_error`.
 #' @examples
-#' select_form_model("examples/survey-form.yaml", "survey", "2026.1",
+#' select_form_model("examples/survey-form.yaml", "survey", "2026.2",
 #'                   package = "form.model")
 #' @export
 select_form_model <- function(paths, id, version, package = NULL) {

@@ -53,10 +53,16 @@ Explicit file loading and exact version selection remain available:
 
 ``` r
 select_form_model(
-  "examples/survey-form.yaml", "survey", "2026.1",
+  "examples/survey-form.yaml", "survey", "2026.2",
   package = "form.model"
 )
 ```
+
+## Example workbooks
+
+The installed `examples/` directory includes `survey.xlsx` and `survey-empty.xlsx`, matching `survey-form.yaml`.
+The populated workbook contains three synthetic observations; the matching template has empty data regions.
+See `inst/examples/README.md` for the records and expected split.
 
 ## Contract
 

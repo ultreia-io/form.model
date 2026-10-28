@@ -34,7 +34,7 @@ Declare `Imports: form.model` in `DESCRIPTION`. Supply a documented wrapper with
 survey_model <- function() {
   form.model::select_form_model(
     "forms/survey-form.yaml",
-    id = "survey", version = "2026.1",
+    id = "survey", version = "2026.2",
     package = "exampleforms"
   )
 }
@@ -49,7 +49,7 @@ The bundled example uses exactly the same installed-resource mechanism.
 ```{r}
 path <- form_resource("examples/survey-form.yaml", "form.model")
 stopifnot(file.exists(path))
-m <- select_form_model(path, "survey", "2026.1")
+m <- select_form_model(path, "survey", "2026.2")
 form_code_lists(m)
 form_registries(m)
 ```
