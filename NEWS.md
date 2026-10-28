@@ -1,3 +1,9 @@
+# form.model 0.5.0
+
+* Declare parent keys linking rows between sheets.
+* Define ordered sequences within row groups.
+* Use another field as a numeric upper limit with `maximum_field`.
+
 # form.model 0.4.0
 
 * Declare and inspect primary keys for table sheets.
