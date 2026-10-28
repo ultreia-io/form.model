@@ -1,3 +1,7 @@
+# form.model 0.5.1
+
+* Enrich the survey model and include populated and empty matching workbooks.
+
 # form.model 0.5.0
 
 * Declare parent keys linking rows between sheets.
