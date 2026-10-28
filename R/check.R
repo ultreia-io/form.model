@@ -139,6 +139,32 @@ semantic_check <- function(d, add) {
         if (duplicated(key)[[i]]) add(path, paste0("duplicate primary key field: ", key[[i]]))
       }
     }
+    if (!is.null(sheet$parent_key)) {
+      parent <- sheet$parent_key
+      path <- paste0("$.sheets.", sheet_name, ".parent_key")
+      child_key <- unlist(parent$fields, use.names = FALSE)
+      if (!table) add(path, "parent key requires a table layout")
+      if (anyDuplicated(child_key)) add(path, "duplicate parent key fields")
+      for (name in setdiff(child_key, field_names)) add(path, paste0("unknown child field: ", name))
+      parent_index <- match(parent$sheet, sheet_names)
+      if (is.na(parent_index)) {
+        add(path, paste0("unknown parent sheet: ", parent$sheet))
+      } else {
+        if (parent_index >= sheet_index) add(path, "parent sheet must precede child sheet")
+        target <- d$sheets[[parent$sheet]]
+        target_key <- unlist(target$primary_key, use.names = FALSE)
+        if (!length(target_key)) add(path, "parent sheet must declare a primary key")
+        if (length(child_key) != length(target_key)) {
+          add(path, "parent key must match the primary key component count")
+        } else for (i in seq_along(child_key)) {
+          child_field <- sheet$fields[[child_key[[i]]]]
+          parent_field <- target$fields[[target_key[[i]]]]
+          if (!is.null(child_field) && !is.null(parent_field) &&
+              !identical(child_field$type, parent_field$type))
+            add(path, "parent key components must have the same types as the parent primary key")
+        }
+      }
+    }
     for (field_index in seq_along(sheet$fields)) {
       field_name <- field_names[[field_index]]
       field <- sheet$fields[[field_index]]
@@ -155,6 +181,31 @@ semantic_check <- function(d, add) {
         if (field$type == "integer" && any(unlist(constraints[c("minimum", "maximum")]) %% 1 != 0)) {
           add(field_path, "integer bounds must be whole numbers")
         }
+      }
+      maximum_field <- field$maximum_field
+      if (!is.null(maximum_field)) {
+        path <- paste0(field_path, ".maximum_field")
+        numeric_types <- c("integer", "number", "latitude", "longitude")
+        if (!field$type %in% numeric_types)
+          add(path, "maximum_field requires a numeric field")
+        if (!maximum_field %in% field_names) {
+          add(path, paste0("unknown field: ", maximum_field))
+        } else if (!sheet$fields[[maximum_field]]$type %in% numeric_types) {
+          add(path, "maximum_field must reference a numeric field")
+        }
+        if (maximum_field == field_name)
+          add(path, "field cannot be its own maximum_field")
+      }
+      if (!is.null(field$sequence)) {
+        path <- paste0(field_path, ".sequence")
+        if (!table) add(path, "sequence requires a table layout")
+        if (!field$type %in% c("integer", "string"))
+          add(path, "sequence requires an integer or string field")
+        groups <- unlist(field$sequence$group_by, use.names = FALSE)
+        if (anyDuplicated(groups)) add(path, "duplicate sequence grouping fields")
+        for (name in setdiff(groups, field_names))
+          add(path, paste0("unknown grouping field: ", name))
+        if (field_name %in% groups) add(path, "sequence cannot group by itself")
       }
       pattern_ok <- TRUE
       if (!is.null(constraints$pattern)) {

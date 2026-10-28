@@ -75,6 +75,17 @@ definitions:
         enum:
         - error
         - warning
+  sequence_rule:
+    type: mapping
+    required: [start, group_by]
+    properties:
+      start:
+        type: integer
+      group_by:
+        type: sequence
+        items:
+          ref: id
+        min_items: 1
   field:
     type: mapping
     required:
@@ -98,6 +109,10 @@ definitions:
         ref: number
       maximum:
         ref: number
+      maximum_field:
+        ref: id
+      sequence:
+        ref: sequence_rule
       pattern:
         ref: text
       unique:
@@ -130,6 +145,17 @@ definitions:
         ref: count
       row_count:
         ref: count
+  parent_key:
+    type: mapping
+    required: [sheet, fields]
+    properties:
+      sheet:
+        ref: id
+      fields:
+        type: sequence
+        items:
+          ref: id
+        min_items: 1
   sheet:
     type: mapping
     required:
@@ -138,6 +164,8 @@ definitions:
     properties:
       layout:
         ref: layout
+      parent_key:
+        ref: parent_key
       primary_key:
         type: sequence
         items:
