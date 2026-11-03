@@ -19,5 +19,6 @@ raise \code{model_form_error}.
 Locate an installed resource
 }
 \examples{
+# Locate the installed survey definition.
 form_resource("examples/survey/form.yaml", "form.model")
 }

@@ -23,6 +23,7 @@ anything other than one match raise \code{model_form_error}.
 Select an exact model version
 }
 \examples{
+# Select the survey definition with the exact requested version.
 select_form_model("examples/survey/form.yaml", "survey", "2026.2",
                   package = "form.model")
 }

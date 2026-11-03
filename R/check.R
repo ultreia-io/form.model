@@ -3,6 +3,7 @@
 #' @return The schema as a nested list. Unsupported versions raise `model_form_error`.
 #' @details Uses the package's `form.model/schema/1` dialect, not JSON Schema.
 #' @examples
+#' # Inspect the supported schema contract version.
 #' form_schema()$contract_version
 #' @export
 form_schema <- function(version = "1.0.0") {
@@ -280,8 +281,10 @@ semantic_check <- function(d, add) {
 #'   Invalid definitions return diagnostics; invalid arguments raise `model_form_error`.
 #'   Submitted data is not checked.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' check_form_model(form_definition(model))
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Check the structure and consistency of the definition.
+#' check_form_model(form_definition(model_definition))
 #' @export
 check_form_model <- function(definition, resource = "<list>") {
   text_arg(resource, "resource")
@@ -301,8 +304,10 @@ check_form_model <- function(definition, resource = "<list>") {
 #' @return The definition as a `form_model` list, without the source label.
 #'   Invalid definitions raise `model_form_error` with diagnostics.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' as_form_model(form_definition(model))
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Construct a checked model from the definition.
+#' as_form_model(form_definition(model_definition))
 #' @export
 as_form_model <- function(definition, resource = "<list>") {
   result <- check_form_model(definition, resource)

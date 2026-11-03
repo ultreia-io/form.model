@@ -19,8 +19,10 @@ model_arg <- function(model) {
 #' @details Accessors preserve declaration order and do not revalidate models.
 #'   Treat checked models as read-only. Invalid model arguments raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' form_definition(model)$form
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Inspect the declared form identity.
+#' form_definition(model_definition)$form
 #' @export
 form_definition <- function(model) {
   model_arg(model)
@@ -33,8 +35,10 @@ form_definition <- function(model) {
 #' @inheritParams form_definition
 #' @return A list with `form` and `schema_version`.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' form_metadata(model)
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Inspect the model identity and declared reference catalogues.
+#' form_metadata(model_definition)
 #' @export
 form_metadata <- function(model) {
   d <- form_definition(model)
@@ -49,8 +53,10 @@ form_metadata <- function(model) {
 #'   Omitted `mandatory` becomes `FALSE`; reference severity defaults to `"error"`.
 #'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' form_fields(model, sheet = "Observations")
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Inspect the observation fields in workbook column order.
+#' form_fields(model_definition, sheet = "Observations")
 #' @export
 form_fields <- function(model, sheet = NULL) {
   sheets <- form_sheets(model)
@@ -87,8 +93,10 @@ form_fields <- function(model, sheet = NULL) {
 #' @param id Exact `<sheet>.<field>` identifier.
 #' @return One definition as returned by [`form_fields()`][form.model::form_fields]. Unknown IDs raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' form_field(model, "Observations.unit")$enum
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Inspect the allowed values for the observation unit.
+#' form_field(model_definition, "Observations.unit")$enum
 #' @export
 form_field <- function(model, id) {
   text_arg(id, "id")
@@ -106,8 +114,10 @@ form_field <- function(model, id) {
 #'   this package checks the declaration, not submitted values.
 #'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' names(form_sheets(model))
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # List the worksheet names in workbook order.
+#' names(form_sheets(model_definition))
 #' @export
 form_sheets <- function(model) {
   sheets <- form_definition(model)$sheets
@@ -125,8 +135,10 @@ form_sheets <- function(model) {
 #' @return The effective layout (`cells` or `table`), with table `column_count`
 #'   derived from the fields. Unknown sheets raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' form_layout(model, "Observations")
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Inspect the observation table layout.
+#' form_layout(model_definition, "Observations")
 #' @export
 form_layout <- function(model, id) {
   text_arg(id, "id")
@@ -140,8 +152,10 @@ form_layout <- function(model, id) {
 #' @return A named list of catalogue names and their declared table identifiers.
 #'   Reference data is not loaded.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' form_references(model)
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Inspect the catalogue and table requirements.
+#' form_references(model_definition)
 #' @export
 form_references <- function(model) form_definition(model)$references
 

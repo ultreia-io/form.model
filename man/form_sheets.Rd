@@ -23,6 +23,8 @@ this package checks the declaration, not submitted values.
 Use \code{\link[=form_definition]{form_definition()}} for the original declarations.
 }
 \examples{
-model <- read_form_model("examples/survey/form.yaml", "form.model")
-names(form_sheets(model))
+# Load the bundled survey model.
+model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+# List the worksheet names in workbook order.
+names(form_sheets(model_definition))
 }

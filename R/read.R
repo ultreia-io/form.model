@@ -117,6 +117,7 @@ read_yaml_data <- function(path) {
 #' @return Absolute file path. Missing files and paths escaping the package
 #'   raise `model_form_error`.
 #' @examples
+#' # Locate the installed survey definition.
 #' form_resource("examples/survey/form.yaml", "form.model")
 #' @export
 form_resource <- function(path, package) {
@@ -144,8 +145,10 @@ form_resource <- function(path, package) {
 #'   for booleans. Tags, anchors, aliases, merges, directives and document markers
 #'   are unsupported. The source path is not stored in the model.
 #' @examples
-#' model <- read_form_model("examples/survey/form.yaml", "form.model")
-#' form_metadata(model)
+#' # Load the bundled survey model.
+#' model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+#' # Inspect the model identity and declared reference catalogues.
+#' form_metadata(model_definition)
 #' @export
 read_form_model <- function(path, package = NULL) {
   if (!is.null(package)) path <- form_resource(path, package)
@@ -159,12 +162,17 @@ read_form_model <- function(path, package = NULL) {
 #' @param directory Directory containing the file.
 #' @return A checked `form_model`; see [`read_form_model()`][form.model::read_form_model] for errors.
 #' @examples
-#' directory <- tempfile("named-model-")
-#' dir.create(directory)
+#' # Choose a temporary directory for the named model example.
+#' model_directory <- tempfile("named-model-")
+#' # Create the temporary model directory.
+#' dir.create(model_directory)
+#' # Copy the survey definition using the named-loader convention.
 #' file.copy(form_resource("examples/survey/form.yaml", "form.model"),
-#'   file.path(directory, "survey-form.yaml"))
-#' load_form_model("survey", directory)
-#' unlink(directory, recursive = TRUE)
+#'   file.path(model_directory, "survey-form.yaml"))
+#' # Load the definition using its filename prefix.
+#' load_form_model("survey", model_directory)
+#' # Remove the temporary model directory.
+#' unlink(model_directory, recursive = TRUE)
 #' @export
 load_form_model <- function(name, directory) {
   text_arg(name, "name")
@@ -183,6 +191,7 @@ load_form_model <- function(name, directory) {
 #' @return The matching `form_model`. All files are checked; invalid files or
 #'   anything other than one match raise `model_form_error`.
 #' @examples
+#' # Select the survey definition with the exact requested version.
 #' select_form_model("examples/survey/form.yaml", "survey", "2026.2",
 #'                   package = "form.model")
 #' @export

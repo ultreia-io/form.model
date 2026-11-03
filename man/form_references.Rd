@@ -17,6 +17,8 @@ Reference data is not loaded.
 Get declared reference catalogues and tables
 }
 \examples{
-model <- read_form_model("examples/survey/form.yaml", "form.model")
-form_references(model)
+# Load the bundled survey model.
+model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+# Inspect the catalogue and table requirements.
+form_references(model_definition)
 }

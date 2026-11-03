@@ -1,7 +1,7 @@
-# Survey workbook example
+# Survey form example
 
 `form.xlsx` and `form-empty.xlsx` match `form.yaml`, version `2026.2`.
-Both workbooks use the same layout, styles and Excel date system.
+Both forms use the same layout, styles and Excel date system.
 
 | Sheet        | Data location | Contents                                  |
 | ------------ | ------------- | ----------------------------------------- |
@@ -29,4 +29,4 @@ Submission `001` is text and retains its leading zeros. Dates and Booleans use n
 
 All records and reference identifiers are synthetic, including `observer-1`, `observer-2` and `survey@example.org`.
 The model declares named reference bindings for stations, observers and contact email.
-Retrieve a workbook with `form_resource("examples/survey/form.xlsx", "form.model")`.
+Retrieve the populated form with `form_resource("examples/survey/form.xlsx", "form.model")`.

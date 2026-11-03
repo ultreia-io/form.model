@@ -19,5 +19,6 @@ Read the model-definition schema
 Uses the package's \code{form.model/schema/1} dialect, not JSON Schema.
 }
 \examples{
+# Inspect the supported schema contract version.
 form_schema()$contract_version
 }

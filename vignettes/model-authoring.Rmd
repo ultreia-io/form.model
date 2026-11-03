@@ -9,11 +9,12 @@ vignette: >
 
 ## 1. Copy the example
 
-[Download the survey YAML](https://raw.githubusercontent.com/ultreia-io/form.model/develop/inst/examples/survey/form.yaml)
+[Download the survey YAML](../examples/survey/form.yaml)
 and save it as `my-form.yaml`.
 
 
 ```{r, results='asis', echo=FALSE}
+# Display the bundled definition as a YAML example.
 cat("```yaml\n", paste(readLines(form.model::form_resource("examples/survey/form.yaml", "form.model")), collapse="\n"), "\n```\n", sep="")
 ```
 
@@ -32,6 +33,7 @@ For table sheets, field order is column order. The column count is derived from 
 ## 3. Check your model
 
 ```r
+# Load the edited definition and report any model errors.
 form.model::read_form_model("my-form.yaml")
 ```
 
