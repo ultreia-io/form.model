@@ -43,38 +43,18 @@ definitions:
       version:
         ref: version
   reference_use:
-    shorthand: {ref: id}
     type: mapping
-    required:
-    - id
+    required: [catalogue, table, lookup]
     properties:
-      id:
+      catalogue:
+        ref: id
+      table:
+        ref: id
+      lookup:
         ref: id
       severity:
         type: string
-        enum:
-        - error
-        - warning
-  registry_use:
-    type: mapping
-    required:
-    - id
-    - column
-    properties:
-      id:
-        ref: id
-      column:
-        ref: id
-      matching:
-        type: string
-        enum:
-        - exact
-        - name
-      severity:
-        type: string
-        enum:
-        - error
-        - warning
+        enum: [error, warning]
   sequence_rule:
     type: mapping
     required: [start, group_by]
@@ -119,10 +99,6 @@ definitions:
         ref: boolean
       reference:
         ref: reference_use
-      code_list:
-        ref: reference_use
-      registry:
-        ref: registry_use
   fields:
     type: mapping
     key_pattern: ^[A-Za-z][A-Za-z0-9_.-]*$
@@ -185,13 +161,11 @@ definitions:
       ref: id
     min_items: 0
   references:
-    shorthand: {ref: reference_ids}
     type: mapping
-    properties:
-      code_lists:
-        ref: reference_ids
-      registries:
-        ref: reference_ids
+    key_pattern: ^[A-Za-z][A-Za-z0-9_.-]*$
+    values:
+      ref: reference_ids
+    min_items: 0
   model:
     type: mapping
     required:

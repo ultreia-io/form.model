@@ -23,6 +23,6 @@ this package checks the declaration, not submitted values.
 Use \code{\link[=form_definition]{form_definition()}} for the original declarations.
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
+model <- read_form_model("examples/survey/form.yaml", "form.model")
 names(form_sheets(model))
 }

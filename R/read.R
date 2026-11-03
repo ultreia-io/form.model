@@ -117,7 +117,7 @@ read_yaml_data <- function(path) {
 #' @return Absolute file path. Missing files and paths escaping the package
 #'   raise `model_form_error`.
 #' @examples
-#' form_resource("examples/survey-form.yaml", "form.model")
+#' form_resource("examples/survey/form.yaml", "form.model")
 #' @export
 form_resource <- function(path, package) {
   text_arg(path, "path")
@@ -144,7 +144,7 @@ form_resource <- function(path, package) {
 #'   for booleans. Tags, anchors, aliases, merges, directives and document markers
 #'   are unsupported. The source path is not stored in the model.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' form_metadata(model)
 #' @export
 read_form_model <- function(path, package = NULL) {
@@ -159,8 +159,12 @@ read_form_model <- function(path, package = NULL) {
 #' @param directory Directory containing the file.
 #' @return A checked `form_model`; see [`read_form_model()`][form.model::read_form_model] for errors.
 #' @examples
-#' directory <- system.file("examples", package = "form.model")
+#' directory <- tempfile("named-model-")
+#' dir.create(directory)
+#' file.copy(form_resource("examples/survey/form.yaml", "form.model"),
+#'   file.path(directory, "survey-form.yaml"))
 #' load_form_model("survey", directory)
+#' unlink(directory, recursive = TRUE)
 #' @export
 load_form_model <- function(name, directory) {
   text_arg(name, "name")
@@ -179,7 +183,7 @@ load_form_model <- function(name, directory) {
 #' @return The matching `form_model`. All files are checked; invalid files or
 #'   anything other than one match raise `model_form_error`.
 #' @examples
-#' select_form_model("examples/survey-form.yaml", "survey", "2026.2",
+#' select_form_model("examples/survey/form.yaml", "survey", "2026.2",
 #'                   package = "form.model")
 #' @export
 select_form_model <- function(paths, id, version, package = NULL) {

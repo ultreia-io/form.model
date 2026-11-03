@@ -19,5 +19,5 @@ raise \code{model_form_error}.
 Locate an installed resource
 }
 \examples{
-form_resource("examples/survey-form.yaml", "form.model")
+form_resource("examples/survey/form.yaml", "form.model")
 }

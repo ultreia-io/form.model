@@ -19,6 +19,6 @@ derived from the fields. Unknown sheets raise \code{model_form_error}.
 Get a sheet layout
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
+model <- read_form_model("examples/survey/form.yaml", "form.model")
 form_layout(model, "Observations")
 }

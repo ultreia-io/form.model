@@ -25,14 +25,14 @@ This package checks form definitions. Submitted-data validation belongs to `form
 
 ```{r}
 library(form.model)
-directory <- system.file("examples", package = "form.model")
-m <- load_form_model("survey", directory)
+directory <- system.file("examples", "survey", package = "form.model")
+m <- read_form_model(file.path(directory, "form.yaml"))
 m
 ```
 
-The example ships under `inst/examples/`, so it remains available after installation.
+The example ships under `inst/examples/survey/`, so it remains available after installation.
 
-The name `survey` resolves to `survey-form.yaml` in that directory. This is the standard naming convention.
+The example reads `form.yaml` from that directory.
 
 Choose the version directory explicitly; the loader never searches for a latest version.
 
@@ -64,7 +64,7 @@ The S3 class selects the compact `print()` method shown above. It does not make 
 
 ```{r}
 d <- form_definition(m)
-d$sheets[[2]]$fields[[1]]$code_list <- "missing"
+d$sheets[[2]]$fields[[1]]$reference <- "missing"
 result <- check_form_model(d, resource = "my-definition.yaml")
 result$diagnostics
 stopifnot(!result$valid)

@@ -19,11 +19,10 @@ Get fields in declaration order
 }
 \details{
 Adds field IDs, names, sheet names and numeric coordinates.
-Omitted \code{mandatory} becomes \code{FALSE}; code-list and registry shorthand become
-mappings. Severity defaults to \code{"error"}; registry matching defaults to \code{"exact"}.
+Omitted \code{mandatory} becomes \code{FALSE}; reference severity defaults to \code{"error"}.
 Use \code{\link[=form_definition]{form_definition()}} for the original declarations.
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
+model <- read_form_model("examples/survey/form.yaml", "form.model")
 form_fields(model, sheet = "Observations")
 }

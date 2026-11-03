@@ -36,8 +36,7 @@ Optional constraints are:
 - `sequence`: consecutive integer numbering in worksheet order, grouped by same-sheet fields.
   Declare `sequence: {start: 1, group_by: [trip_id, catch_id]}` on an integer or string table field.
 - `unique`: requires distinct values within a repeated table field.
-- `code_list`: an ID declared under `references.code_lists` for a string or email field.
-- `registry`: an ID declared under `references.registries` for a string or email field.
+- `reference`: a catalogue, table and named lookup.
 
 Enums are constraints, not a separate type. Quote numeric-looking string codes: `enum: ["01", "02"]`.
 
@@ -47,27 +46,22 @@ In tables, this applies within the same row. A field cannot depend on itself; mu
 
 The condition still permits a unit when length is empty.
 
-Both bindings default to error severity. Use `code_list: {id: observers, severity: warning}` for a warning.
+Reference bindings default to error severity. Use `severity: warning` for a warning.
 
-For registries, use `registry: {id: contacts, column: email, severity: warning}`.
-Matching defaults to `exact`; `name` requires a string field.
-Registry aliases belong to the supplied registry snapshot, not the form field.
-
-For example, declare the registry under `references`, then bind a string field:
+Declare tables under freely named catalogues:
 
 ```yaml
 references:
-  registries: [contacts]
+  people: [contacts]
 ```
 
-The field declaration is:
+Bind the field to a table and lookup:
 
 ```yaml
-contact_email: {location: C4, type: email, registry: {id: contacts, column: email, severity: warning}}
+contact_email: {location: C4, type: email, reference: {catalogue: people, table: contacts, lookup: email, severity: warning}}
 ```
 
-The model declares IDs and matching policy, but carries no reference data.
-Callers supply code-list and registry snapshots when validating submitted data.
+Catalogue names have no built-in meaning. Matching settings and reference data belong outside the model.
 
 See `?form_fields` for the effective field properties returned by accessors.
 

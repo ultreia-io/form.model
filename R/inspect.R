@@ -15,23 +15,25 @@ model_arg <- function(model) {
 #' Get the complete definition
 #' @param model A checked `form_model` from [`read_form_model()`][form.model::read_form_model] or [`as_form_model()`][form.model::as_form_model].
 #' @return An ordinary model definition with `form`, `sheets`, and
-#'   `references` containing declared `code_lists` and `registries`.
+#'   `references` containing named catalogues and their declared tables.
 #' @details Accessors preserve declaration order and do not revalidate models.
 #'   Treat checked models as read-only. Invalid model arguments raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' form_definition(model)$form
 #' @export
 form_definition <- function(model) {
   model_arg(model)
-  unclass(model)
+  definition <- unclass(model)
+  attributes(definition) <- list(names = names(definition))
+  definition
 }
 
 #' Get form identity and versions
 #' @inheritParams form_definition
 #' @return A list with `form` and `schema_version`.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' form_metadata(model)
 #' @export
 form_metadata <- function(model) {
@@ -44,11 +46,10 @@ form_metadata <- function(model) {
 #' @param sheet Exact worksheet name, or `NULL` for all sheets.
 #' @return Field definitions named `<sheet>.<field>`. Unknown sheets raise `model_form_error`.
 #' @details Adds field IDs, names, sheet names and numeric coordinates.
-#'   Omitted `mandatory` becomes `FALSE`; code-list and registry shorthand become
-#'   mappings. Severity defaults to `"error"`; registry matching defaults to `"exact"`.
+#'   Omitted `mandatory` becomes `FALSE`; reference severity defaults to `"error"`.
 #'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' form_fields(model, sheet = "Observations")
 #' @export
 form_fields <- function(model, sheet = NULL) {
@@ -73,13 +74,8 @@ form_fields <- function(model, sheet = NULL) {
         field$row <- cell$row
         field$column <- cell$column
       }
-      for (kind in c("reference", "code_list", "registry")) {
-        if (is.character(field[[kind]])) field[[kind]] <- list(id = field[[kind]])
-        if (!is.null(field[[kind]]) && is.null(field[[kind]]$severity))
-          field[[kind]]$severity <- "error"
-      }
-      if (!is.null(field$registry) && is.null(field$registry$matching))
-        field$registry$matching <- "exact"
+      if (!is.null(field$reference) && is.null(field$reference$severity))
+        field$reference$severity <- "error"
       result[[field$id]] <- field
     }
   }
@@ -91,7 +87,7 @@ form_fields <- function(model, sheet = NULL) {
 #' @param id Exact `<sheet>.<field>` identifier.
 #' @return One definition as returned by [`form_fields()`][form.model::form_fields]. Unknown IDs raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' form_field(model, "Observations.unit")$enum
 #' @export
 form_field <- function(model, id) {
@@ -110,7 +106,7 @@ form_field <- function(model, id) {
 #'   this package checks the declaration, not submitted values.
 #'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' names(form_sheets(model))
 #' @export
 form_sheets <- function(model) {
@@ -129,7 +125,7 @@ form_sheets <- function(model) {
 #' @return The effective layout (`cells` or `table`), with table `column_count`
 #'   derived from the fields. Unknown sheets raise `model_form_error`.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' form_layout(model, "Observations")
 #' @export
 form_layout <- function(model, id) {
@@ -139,27 +135,15 @@ form_layout <- function(model, id) {
   sheets[[id]]$layout
 }
 
-#' Get code-list requirements
+#' Get declared reference catalogues and tables
 #' @inheritParams form_definition
-#' @return Declared code-list names. Reference data is not loaded.
+#' @return A named list of catalogue names and their declared table identifiers.
+#'   Reference data is not loaded.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
-#' form_code_lists(model)
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
+#' form_references(model)
 #' @export
-form_code_lists <- function(model) {
-  d <- form_definition(model)
-  refs <- d$references
-  unlist(if (is.null(names(refs))) refs else refs$code_lists, use.names = FALSE)
-}
-
-#' Get registry requirements
-#' @inheritParams form_definition
-#' @return Declared registry table names. This does not load registry data.
-#' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
-#' form_registries(model)
-#' @export
-form_registries <- function(model) unlist(form_definition(model)$references$registries, use.names = FALSE)
+form_references <- function(model) form_definition(model)$references
 
 #' Print a model summary
 #' @param x A checked `form_model`.

@@ -15,14 +15,14 @@ sheets:
     fields:
       submission: {mandatory: true, location: C2, type: string, pattern: '^[0-9]{3}$'}
       date: {mandatory: true, location: C3, type: date}
-      contact_email: {location: C4, type: email, registry: {id: contacts, column: email, severity: warning}}
+      contact_email: {location: C4, type: email, reference: {catalogue: registries, table: contacts, lookup: email, severity: warning}}
       comment: {location: C5, type: string}
   # Repeated rows; field declaration order determines column order.
   Observations:
     layout: {kind: table, start_row: 6}
     primary_key: [station, observation_id]
     fields:
-      station: {mandatory: true, type: string, code_list: stations}
+      station: {mandatory: true, type: string, reference: {catalogue: code_lists, table: stations, lookup: code}}
       count: {mandatory: true, type: integer, minimum: 0, maximum: 1000}
       length: {type: number, minimum: 0}
       unit: {type: string, required_field: length, enum: [cm, m]}
@@ -32,7 +32,7 @@ sheets:
       longitude: {type: longitude}
       observation_id: {type: string, pattern: '^OBS-[0-9]{3}$'}
       quality: {type: integer, enum: [1, 2, 3]}
-      observer: {type: string, code_list: {id: observers, severity: warning}}
+      observer: {type: string, reference: {catalogue: code_lists, table: observers, lookup: code, severity: warning}}
   Samples:
     layout: {kind: table, start_row: 6}
     primary_key: [station, observation_id, sample_no]

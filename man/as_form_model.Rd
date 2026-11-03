@@ -19,6 +19,6 @@ Invalid definitions raise \code{model_form_error} with diagnostics.
 Construct a checked model
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
+model <- read_form_model("examples/survey/form.yaml", "form.model")
 as_form_model(form_definition(model))
 }

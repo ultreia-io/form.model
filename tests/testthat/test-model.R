@@ -6,10 +6,10 @@ test_that("installed resources and ordered accessors work independently of cwd",
   expect_identical(names(form_fields(m, "Metadata")),
                    c("Metadata.submission", "Metadata.date", "Metadata.contact_email", "Metadata.comment"))
   expect_identical(names(form_sheets(m)), c("Metadata", "Observations", "Samples", "Measurements", "Equipment"))
-  expect_identical(form_code_lists(m), c("observers", "stations"))
+  expect_identical(unlist(form_references(m)$code_lists, use.names = FALSE), c("observers", "stations"))
   expect_identical(form_layout(m, "Observations")$start_row, 6L)
   expect_identical(form_field(m, "Observations.unit")$enum, list("cm", "m"))
-  expect_identical(form_field(m, "Observations.station")$code_list$severity, "error")
+  expect_identical(form_field(m, "Observations.station")$reference$severity, "error")
   expect_identical(form_sheets(m)$Samples$parent_key$sheet, "Observations")
   expect_identical(form_sheets(m)$Measurements$parent_key$sheet, "Samples")
   expect_identical(form_field(m, "Samples.minimum_length")$maximum_field, "maximum_length")
@@ -30,11 +30,11 @@ test_that("compact declarations expose effective field values", {
   m <- example_model()
   expect_identical(names(m$sheets$Metadata$fields), c("submission", "date", "contact_email", "comment"))
   expect_false("mandatory" %in% names(m$sheets$Metadata$fields$comment))
-  expect_identical(m$sheets$Observations$fields$station$code_list, "stations")
+  expect_identical(m$sheets$Observations$fields$station$reference, list(catalogue = "code_lists", table = "stations", lookup = "code"))
   expect_false(form_field(m, "Metadata.comment")$mandatory)
   expect_true(form_field(m, "Metadata.submission")$mandatory)
   expect_identical(form_field(m, "Observations.count")$column, 2L)
-  expect_identical(form_field(m, "Observations.station")$code_list$severity, "error")
+  expect_identical(form_field(m, "Observations.station")$reference$severity, "error")
 
   d <- form_definition(m)
   d$form$version <- "2026.3"
@@ -50,7 +50,7 @@ test_that("compact declarations expose effective field values", {
 test_that("selection requires exact form identity and rejects ambiguity", {
   path <- example_path()
   expect_identical(select_form_model(path, "survey", "2026.2"), example_model())
-  expect_s3_class(select_form_model("examples/survey-form.yaml", "survey", "2026.2", "form.model"), "form_model")
+  expect_s3_class(select_form_model("examples/survey/form.yaml", "survey", "2026.2", "form.model"), "form_model")
   expect_error(select_form_model(path, "Survey", "2026.2"), "matched 0")
   expect_error(select_form_model(path, "survey", "2026"), "matched 0")
   expect_error(select_form_model(c(path, path), "survey", "2026.2"), "matched 2")
@@ -97,16 +97,18 @@ test_that("hidden mutable attributes cannot enter model values", {
   expect_bad(d, ".type", "expected string")
 })
 
-test_that("code-list shorthand preserves declarations and resolves severity", {
-  compact <- example_model()
+test_that("neutral reference bindings preserve declarations and resolve severity", {
+  compact_definition <- form_definition(example_model())
+  compact_definition$sheets$Observations$fields$station$reference <- list(catalogue = "code_lists", table = "stations", lookup = "code")
+  compact <- as_form_model(compact_definition)
   d <- form_definition(compact)
-  d$sheets$Observations$fields$station$code_list <- list(id = "stations", severity = "error")
+  d$sheets$Observations$fields$station$reference <- list(catalogue = "code_lists", table = "stations", lookup = "code", severity = "error")
   expect_identical(form_fields(compact), form_fields(as_form_model(d)))
-  d$sheets$Observations$fields$station$code_list$severity <- "warning"
-  expect_identical(form_field(as_form_model(d), "Observations.station")$code_list,
-                   list(id = "stations", severity = "warning"))
+  d$sheets$Observations$fields$station$reference$severity <- "warning"
+  expect_identical(form_field(as_form_model(d), "Observations.station")$reference,
+                   list(catalogue = "code_lists", table = "stations", lookup = "code", severity = "warning"))
   expect_identical(form_definition(compact)$sheets$Observations$fields$station,
-                   list(mandatory = TRUE, type = "string", code_list = "stations"))
+                   list(mandatory = TRUE, type = "string", reference = list(catalogue = "code_lists", table = "stations", lookup = "code")))
 })
 
 test_that("cell locations decode across column letter boundaries", {

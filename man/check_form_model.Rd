@@ -24,6 +24,6 @@ Invalid definitions return diagnostics; invalid arguments raise \code{model_form
 Submitted data is not checked.
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
+model <- read_form_model("examples/survey/form.yaml", "form.model")
 check_form_model(form_definition(model))
 }

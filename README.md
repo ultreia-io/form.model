@@ -35,16 +35,16 @@ pak::pak("ultreia-io/form.model@develop")
 
 ``` r
 library(form.model)
-directory <- system.file("examples", package = "form.model")
-m <- load_form_model("survey", directory)
+directory <- system.file("examples", "survey", package = "form.model")
+m <- read_form_model(file.path(directory, "form.yaml"))
 
 form_field(m, "Observations.unit")[c("enum", "required_field")]
+form_field(m, "Observations.station")$reference
 form_layout(m, "Observations")$start_row
 check_form_model(form_definition(m))
 ```
 
-The name `survey` resolves exactly to `survey-form.yaml` in the supplied
-directory.
+The example reads `form.yaml` from the supplied directory.
 
 Use separate directories for different versions. No directory scanning
 or latest-version selection occurs.
@@ -53,16 +53,16 @@ Explicit file loading and exact version selection remain available:
 
 ``` r
 select_form_model(
-  "examples/survey-form.yaml", "survey", "2026.2",
+  "examples/survey/form.yaml", "survey", "2026.2",
   package = "form.model"
 )
 ```
 
 ## Example workbooks
 
-The installed `examples/` directory includes `survey.xlsx` and `survey-empty.xlsx`, matching `survey-form.yaml`.
+The installed `examples/survey/` directory includes `form.xlsx` and `form-empty.xlsx`, matching `form.yaml`.
 The populated workbook contains three synthetic observations; the matching template has empty data regions.
-See `inst/examples/README.md` for the records and expected split.
+See `inst/examples/survey/README.md` for the workbook records.
 
 ## Contract
 
@@ -99,9 +99,10 @@ and the resolved defaults above.
 
 Declare code-list IDs under `references.code_lists` and registry IDs under `references.registries`.
 Use `code_list` or `registry` on a field to bind it to a declared ID.
-Registry bindings may specify `matching: name`, `aliases`, and `severity`.
-Each registry binding selects a `column` from its declared table.
-Inspect the declarations with `form_code_lists()` and `form_registries()`.
+Registry bindings select either a `column` with matching options, or a named `lookup`.
+A reference package resolves named lookups before rule generation; `form.model` does not load their configuration.
+Severity stays on field bindings; aliases belong to reference snapshots.
+Inspect the declarations with `form_references()` and `form_references()`.
 
 ## Guides
 

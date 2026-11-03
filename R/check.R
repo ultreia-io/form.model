@@ -48,7 +48,7 @@ schema_check <- function(x, node, definitions, path, add) {
   }
   type <- node$type
   valid <- switch(type,
-    mapping = is.list(x) && plain(x) && !is.null(names(x)),
+    mapping = is.list(x) && plain(x) && (!length(x) || !is.null(names(x))),
     sequence = is.list(x) && plain(x) && is.null(names(x)),
     scalar_type(x, type))
   if (!valid) {
@@ -94,18 +94,12 @@ schema_check <- function(x, node, definitions, path, add) {
 #'   passed to `add`.
 #' @keywords internal
 semantic_check <- function(d, add) {
-  reference_groups <- !is.null(names(d$references))
-  code_lists <- unlist(if (reference_groups) d$references$code_lists else d$references, use.names = FALSE)
-  code_list_path <- if (reference_groups) "references.code_lists" else "references"
-  registries <- unlist(if (reference_groups) d$references$registries else NULL, use.names = FALSE)
-  for (i in which(duplicated(code_lists))) {
-    add(paste0("$.", code_list_path, "[", i, "]"), paste0("duplicate code list: ", code_lists[[i]]))
+  for (catalogue in names(d$references)) {
+    tables <- unlist(d$references[[catalogue]], use.names = FALSE)
+    for (i in which(duplicated(tables)))
+      add(paste0("$.references.", catalogue, "[", i, "]"),
+          paste0("duplicate reference table: ", tables[[i]]))
   }
-  for (i in which(duplicated(registries))) {
-    add(paste0("$.references.registries[", i, "]"), paste0("duplicate registry: ", registries[[i]]))
-  }
-  for (id in intersect(code_lists, registries))
-    add("$.references.registries", paste0("ID is also a code list: ", id))
   sheet_names <- names(d$sheets)
   if (anyDuplicated(tolower(sheet_names))) add("$.sheets", "duplicate workbook sheet names (case insensitive)")
   for (sheet_index in seq_along(d$sheets)) {
@@ -219,21 +213,13 @@ semantic_check <- function(d, add) {
         }, error = function(e) FALSE)
         if (!pattern_ok) add(paste0(field_path, ".pattern"), "invalid PCRE regular expression")
       }
-      if (!is.null(constraints$reference) && !is.null(constraints$code_list))
-        add(field_path, "use code_list instead of reference")
-      for (kind in c("reference", "code_list", "registry")) {
-        use <- constraints[[kind]]
-        if (is.null(use)) next
-        id <- if (is.list(use)) use$id else use
-        path <- paste0(field_path, ".", kind, if (is.list(use)) ".id" else "")
-        declared <- if (kind == "registry") registries else code_lists
-        if (!id %in% declared) add(path, paste0("unknown ", kind, ": ", id))
-        if (!field$type %in% if (kind == "reference") "string" else c("string", "email"))
-          add(path, if (kind == "reference") "reference constraints require a string field" else
-            paste0(kind, " constraints require a string or email field"))
-        if (kind == "registry" && is.list(use) && identical(use$matching, "name") &&
-            field$type != "string")
-          add(path, "registry name matching requires a string field")
+      use <- constraints$reference
+      if (!is.null(use)) {
+        path <- paste0(field_path, ".reference")
+        if (!use$catalogue %in% names(d$references))
+          add(paste0(path, ".catalogue"), paste0("unknown reference catalogue: ", use$catalogue))
+        else if (!use$table %in% unlist(d$references[[use$catalogue]], use.names = FALSE))
+          add(paste0(path, ".table"), paste0("unknown reference table: ", use$table))
       }
       dependency <- field$required_field
       if (!is.null(dependency)) {
@@ -294,7 +280,7 @@ semantic_check <- function(d, add) {
 #'   Invalid definitions return diagnostics; invalid arguments raise `model_form_error`.
 #'   Submitted data is not checked.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' check_form_model(form_definition(model))
 #' @export
 check_form_model <- function(definition, resource = "<list>") {
@@ -315,7 +301,7 @@ check_form_model <- function(definition, resource = "<list>") {
 #' @return The definition as a `form_model` list, without the source label.
 #'   Invalid definitions raise `model_form_error` with diagnostics.
 #' @examples
-#' model <- read_form_model("examples/survey-form.yaml", "form.model")
+#' model <- read_form_model("examples/survey/form.yaml", "form.model")
 #' as_form_model(form_definition(model))
 #' @export
 as_form_model <- function(definition, resource = "<list>") {
