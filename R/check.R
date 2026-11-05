@@ -134,6 +134,16 @@ semantic_check <- function(d, add) {
         if (duplicated(key)[[i]]) add(path, paste0("duplicate primary key field: ", key[[i]]))
       }
     }
+    for (constraint in c("unique_key", "at_least_one")) {
+      declaration <- sheet[[constraint]]
+      if (is.null(declaration)) next
+      path <- paste0("$.sheets.", sheet_name, ".", constraint)
+      if (!table) add(path, paste0(constraint, " requires a table layout"))
+      key <- unlist(if (constraint == "at_least_one") declaration$fields else declaration,
+                    use.names = FALSE)
+      if (anyDuplicated(key)) add(path, paste0("duplicate ", constraint, " fields"))
+      for (name in setdiff(key, field_names)) add(path, paste0("unknown field: ", name))
+    }
     if (!is.null(sheet$parent_key)) {
       parent <- sheet$parent_key
       path <- paste0("$.sheets.", sheet_name, ".parent_key")

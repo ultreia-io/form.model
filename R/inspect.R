@@ -112,6 +112,9 @@ form_field <- function(model, id) {
 #'   An optional `primary_key` preserves the declared sequence of local field names.
 #'   Key components must be filled and their combination must identify one row;
 #'   this package checks the declaration, not submitted values.
+#'   `unique_key` preserves an ordered key whose complete values must be unique.
+#'   `at_least_one` preserves selected fields and optional severity (default error);
+#'   populated rows must supply at least one selected value.
 #'   Use [`form_definition()`][form.model::form_definition] for the original declarations.
 #' @examples
 #' # Load the bundled survey model.

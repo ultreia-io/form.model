@@ -61,3 +61,15 @@ sheets:
       equipment_id: {mandatory: true, type: string}
       serial: {mandatory: true, type: string, unique: true}
       label: {mandatory: true, type: string}
+  # Optional child details: complete keys must be unique; empty information warns.
+  Notes:
+    layout: {kind: table, start_row: 6}
+    parent_key: {sheet: Observations, fields: [station, observation_id]}
+    unique_key: [station, observation_id, category]
+    at_least_one: {fields: [category, count, confirmed], severity: warning}
+    fields:
+      station: {mandatory: true, type: string}
+      observation_id: {mandatory: true, type: string}
+      category: {type: string}
+      count: {type: integer, minimum: 0}
+      confirmed: {type: boolean}

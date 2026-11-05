@@ -5,7 +5,7 @@ test_that("installed resources and ordered accessors work independently of cwd",
   expect_true(check_form_model(form_definition(m))$valid)
   expect_identical(names(form_fields(m, "Metadata")),
                    c("Metadata.submission", "Metadata.date", "Metadata.contact_email", "Metadata.comment"))
-  expect_identical(names(form_sheets(m)), c("Metadata", "Observations", "Samples", "Measurements", "Equipment"))
+  expect_identical(names(form_sheets(m)), c("Metadata", "Observations", "Samples", "Measurements", "Equipment", "Notes"))
   expect_identical(unlist(form_references(m)$code_lists, use.names = FALSE), c("observers", "stations"))
   expect_identical(form_layout(m, "Observations")$start_row, 6L)
   expect_identical(form_field(m, "Observations.unit")$enum, list("cm", "m"))
@@ -124,7 +124,7 @@ test_that("cell locations decode across column letter boundaries", {
     expect_false(any(c("row", "column", "constraints") %in% names(d$sheets$Metadata$fields$submission)))
   }
   expect_true(all(vapply(form_sheets(example_model()), function(sheet) {
-    identical(setdiff(names(sheet), c("primary_key", "parent_key")), c("layout", "fields"))
+    identical(setdiff(names(sheet), c("primary_key", "parent_key", "unique_key", "at_least_one")), c("layout", "fields"))
   }, logical(1))))
 })
 

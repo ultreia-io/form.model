@@ -147,6 +147,23 @@ definitions:
         items:
           ref: id
         min_items: 1
+      unique_key:
+        type: sequence
+        items:
+          ref: id
+        min_items: 1
+      at_least_one:
+        type: mapping
+        required: [fields]
+        properties:
+          fields:
+            type: sequence
+            items:
+              ref: id
+            min_items: 1
+          severity:
+            type: string
+            enum: [error, warning, info]
       fields:
         ref: fields
   sheets:
