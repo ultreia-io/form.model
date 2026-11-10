@@ -72,30 +72,17 @@ jobs:
       R_CHECK_ENVIRON: ${{ github.workspace }}/tools/check.Renviron
 
     steps:
-      # Keep downloaded APT packages: Docker images normally delete them after installation.
-      - name: Prepare Linux package cache
-        if: matrix.config.container != ''
-        id: apt-cache
-        run: |
-          rm -f /etc/apt/apt.conf.d/docker-clean
-          echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
-          # Identify the actual image so latest never reuses another R or OS version's cache.
-          echo "r-version=$(Rscript -e 'cat(as.character(getRversion()))')" >> "$GITHUB_OUTPUT"
-          . /etc/os-release
-          echo "os-version=${ID}-${VERSION_ID}" >> "$GITHUB_OUTPUT"
+      # An explicit ref selects a release commit; otherwise use the event commit (the proposed merge for PRs).
+      - name: Check out repository
+        id: checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
-      # Share downloads across Linux jobs; refresh the cache weekly.
-      # APT still refreshes its indexes and installs packages normally.
       - name: Cache Linux packages
         if: matrix.config.container != ''
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
-        with:
-          path: |
-            /var/cache/apt/archives
-            /var/lib/apt/lists
-          key: apt-rocker-${{ steps.apt-cache.outputs.r-version }}-${{ steps.apt-cache.outputs.os-version }}-${{ runner.arch }}-v1-${{ steps.apt-cache.outputs.week }}
-          restore-keys: |
-            apt-rocker-${{ steps.apt-cache.outputs.r-version }}-${{ steps.apt-cache.outputs.os-version }}-${{ runner.arch }}-v1-
+        id: apt-cache
+        uses: ./.github/actions/cache-apt
 
       # Add R check tools, Ubuntu identification and curl/gpg for the Codecov uploader.
       - name: Install Linux check tools
@@ -104,26 +91,19 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends git qpdf ghostscript lsb-release sudo texinfo xz-utils curl gpg tidy
 
-      - name: Install Linux R-devel check tools
-        if: runner.os == 'Linux' && matrix.config.container == ''
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends qpdf ghostscript texinfo xz-utils curl tidy
+      - name: Set up cached Linux R-devel
+        if: matrix.config.r == 'devel'
+        id: setup-r-devel
+        uses: ./.github/actions/setup-r-devel
 
-      # An explicit ref selects a release commit; otherwise use the event commit (the proposed merge for PRs).
-      - name: Check out repository
-        id: checkout
-        uses: actions/checkout@v7.0.1
-        with:
-          ref: ${{ inputs.ref || github.sha }}
-
-      # Reuse the supplied stable R; install R on macOS and for the Linux development version.
+      # Reuse the supplied stable R; install R on macOS.
       - name: Set up R
+        if: matrix.config.r != 'devel'
         id: setup-r
         uses: r-lib/actions/setup-r@v2.12.1
         with:
           r-version: ${{ steps.apt-cache.outputs.r-version || matrix.config.r }}
-          install-r: ${{ runner.os == 'macOS' || matrix.config.r == 'devel' }}
+          install-r: ${{ runner.os == 'macOS' }}
           use-public-rspm: true
 
       # Rocker installs into its site library; tell setup-r-dependencies to cache that actual location.
@@ -135,27 +115,16 @@ jobs:
       # Pandoc is needed to render the package vignettes.
       - name: Set up Pandoc
         uses: r-lib/actions/setup-pandoc@v2.12.1
-      # Provide LaTeX for building and checking the PDF manual.
-      - name: Set up TinyTeX
-        uses: r-lib/actions/setup-tinytex@v2.12.1
-      # R's PDF manual uses Courier fonts, which the minimal TinyTeX bundle may omit.
-      - name: Install manual fonts
-        if: runner.os != 'Windows'
-        run: tlmgr install courier makeindex
-      - name: Install manual fonts on Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: tlmgr install courier makeindex
+      # Reuse the complete manual toolchain across checks and publication.
+      - name: Set up cached TinyTeX
+        uses: ./.github/actions/setup-tinytex
 
       # Restore the last metadata snapshot before dependency resolution on every platform.
       # A new key saves any refreshed metadata; pak still decides when it needs an update.
       - name: Cache R dependency metadata
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        uses: ./.github/actions/cache-r-metadata
         with:
-          path: ${{ env.PKG_METADATA_CACHE_DIR }}
-          key: pak-metadata-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-r.outputs.installed-r-version }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
-          restore-keys: |
-            pak-metadata-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-r.outputs.installed-r-version }}-
+          r-version: ${{ (steps.setup-r.outputs.installed-r-version || steps.setup-r-devel.outputs.installed-r-version) }}
 
       # Install package dependencies plus the tools used to generate documentation and run R CMD check.
       - name: Install R dependencies
