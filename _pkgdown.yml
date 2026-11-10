@@ -22,8 +22,6 @@ articles:
   - title: Guides
     navbar: Guides
     contents: [terminology, form.model, model-authoring, model-specification, downstream-packages]
-  - title: Development
-    contents: [articles/coverage]
 navbar:
   structure:
     left: [intro, reference, articles, news, coverage, community]
@@ -42,7 +40,7 @@ navbar:
           href: articles/downstream-packages.html
     coverage:
       text: Coverage
-      href: articles/coverage.html
+      href: https://app.codecov.io/gh/ultreia-io/form.model
     intro:
       text: Getting started
       href: articles/form.model.html
