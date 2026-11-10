@@ -1,7 +1,7 @@
 # form.model
 
 [![Build](https://img.shields.io/github/actions/workflow/status/ultreia-io/form.model/Build.yaml?branch=develop&label=Build&logo=githubactions&logoColor=white)](https://github.com/ultreia-io/form.model/actions/workflows/Build.yaml?query=branch%3Adevelop)
-[![Website](https://img.shields.io/badge/website-documentation-blue?logo=readthedocs&logoColor=white)](index.html)
+[![Website](https://img.shields.io/badge/website-documentation-blue?logo=readthedocs&logoColor=white)](https://ultreia-io.github.io/form.model/index.html)
 [![License](https://img.shields.io/badge/license-LGPL--2.1-blue?logo=gnu&logoColor=white)](https://github.com/ultreia-io/form.model/blob/main/LICENSE)
 
 [![Latest release](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fultreia-io%2Fform.model%2Freleases%2Flatest&query=%24.tag_name&label=Latest%20release&color=blue&logo=github&logoColor=white)](https://github.com/ultreia-io/form.model/releases/latest)
@@ -14,7 +14,7 @@
 
 > `form.model` gives R packages a shared definition of the Excel forms they work with.
 
-Read the [Terminology](articles/terminology.html) for the concepts used throughout this documentation.
+Read the [Terminology](https://ultreia-io.github.io/form.model/articles/terminology.html) for the concepts used throughout this documentation.
 
 A **form** is an Excel workbook used to collect data. Its **form model** describes the expected structure and rules in YAML.
 
@@ -70,7 +70,7 @@ pak::pak("ultreia-io/form.model@develop")
 
 ## Getting started
 
-Follow the [Getting started guide](articles/form.model.html)
+Follow the [Getting started guide](https://ultreia-io.github.io/form.model/articles/form.model.html)
 to load a form model, inspect its fields and diagnose invalid definitions.
 
 The guide includes downloads of the YAML definition, populated form and empty form.
@@ -78,12 +78,12 @@ The guide includes downloads of the YAML definition, populated form and empty fo
 ## Guides
 
 - [Model authoring and schema
-  dialect](articles/model-authoring.html)
+  dialect](https://ultreia-io.github.io/form.model/articles/model-authoring.html)
 - [Downstream package
-  integration](articles/downstream-packages.html)
+  integration](https://ultreia-io.github.io/form.model/articles/downstream-packages.html)
 - [API
-  reference](reference/index.html)
-- [Contributing](CONTRIBUTING.html) and [maintenance](DEVELOPMENT.html)
+  reference](https://ultreia-io.github.io/form.model/reference/index.html)
+- [Contributing](https://ultreia-io.github.io/form.model/CONTRIBUTING.html) and [maintenance](https://ultreia-io.github.io/form.model/DEVELOPMENT.html)
 
 ## License
 
