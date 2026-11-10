@@ -42,7 +42,14 @@ Form model checks verify the definition itself. The related packages below use i
 
 ## Installation
 
-Install the latest released version directly from GitHub:
+Install the latest version available on CRAN:
+
+``` r
+# Install form.model from CRAN.
+install.packages("form.model")
+```
+
+Alternatively, install the latest GitHub release:
 
 ``` r
 # Install the package installer once.
