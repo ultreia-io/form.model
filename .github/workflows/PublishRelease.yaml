@@ -131,7 +131,7 @@ jobs:
         uses: r-lib/actions/setup-tinytex@v2.12.1
       # R's PDF manual uses Courier fonts, which the minimal TinyTeX bundle may omit.
       - name: Install manual fonts
-        run: tlmgr install courier
+        run: tlmgr install courier makeindex
       # Restore the last metadata snapshot before dependency resolution on every platform.
       # A new key saves any refreshed metadata; pak still decides when it needs an update.
       - name: Cache R dependency metadata

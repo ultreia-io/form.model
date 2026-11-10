@@ -132,11 +132,11 @@ jobs:
       # R's PDF manual uses Courier fonts, which the minimal TinyTeX bundle may omit.
       - name: Install manual fonts
         if: runner.os != 'Windows'
-        run: tlmgr install courier
+        run: tlmgr install courier makeindex
       - name: Install manual fonts on Windows
         if: runner.os == 'Windows'
         shell: pwsh
-        run: tlmgr install courier
+        run: tlmgr install courier makeindex
 
       # Restore the last metadata snapshot before dependency resolution on every platform.
       # A new key saves any refreshed metadata; pak still decides when it needs an update.
