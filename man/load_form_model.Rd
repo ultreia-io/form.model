@@ -19,6 +19,15 @@ A checked \code{form_model}; see \code{\link[=read_form_model]{read_form_model()
 Load a model by filename prefix
 }
 \examples{
-directory <- system.file("examples", package = "form.model")
-load_form_model("survey", directory)
+# Choose a temporary directory for the named model example.
+model_directory <- tempfile("named-model-")
+# Create the temporary model directory.
+dir.create(model_directory)
+# Copy the survey definition using the named-loader convention.
+file.copy(form_resource("examples/survey/form.yaml", "form.model"),
+  file.path(model_directory, "survey-form.yaml"))
+# Load the definition using its filename prefix.
+load_form_model("survey", model_directory)
+# Remove the temporary model directory.
+unlink(model_directory, recursive = TRUE)
 }

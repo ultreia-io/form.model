@@ -8,42 +8,70 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
+# Format the rendered R output consistently.
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(form.model)
 ```
 
 
-## About this example
+Read the [Terminology](terminology.html) for the concepts used in this guide.
+
+## About this guide
 
 This guide demonstrates the bundled survey form definition.
 
-You will load the model, inspect its contents, and see how invalid definitions are reported.
+You will load the form model, inspect its contents, and see how invalid definitions are reported.
 
-This package checks form definitions. Submitted-data validation belongs to `form.validation`.
+## Download the example files
+
+```{r example-downloads, echo=FALSE, results="asis"}
+# Use relative downloads on the website and installed resources in the package guide.
+if (identical(Sys.getenv("IN_PKGDOWN"), "true")) {
+  # Render links relative to the website article.
+  cat("- [Form model — form.yaml](../examples/survey/form.yaml)\n- [Populated form — form.xlsx](../examples/survey/form.xlsx)\n- [Empty form — form-empty.xlsx](../examples/survey/form-empty.xlsx)\n")
+} else {
+  # Explain where the installed package keeps the example files.
+  cat("Find these files with `system.file(\"examples\", \"survey\", package = \"form.model\")`.\n")
+}
+```
+
+The populated form contains three synthetic observations. The empty form has no data rows.
 
 ## Load an installed example
 
 ```{r}
 library(form.model)
-directory <- system.file("examples", package = "form.model")
-m <- load_form_model("survey", directory)
-m
+# Load the bundled survey form model.
+model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+# Display its identity and worksheet summary.
+model_definition
 ```
 
-The example ships under `inst/examples/`, so it remains available after installation.
+The example ships under `inst/examples/survey/`, so it remains available after installation.
 
-The name `survey` resolves to `survey-form.yaml` in that directory. This is the standard naming convention.
+The example reads `form.yaml` from that directory.
 
 Choose the version directory explicitly; the loader never searches for a latest version.
 
 `read_form_model(path, package)` remains available when you need to load an explicit filename.
 
-## What a model contains
+To require an exact form identity and version:
+
+```{r}
+# Select the survey definition with the exact requested version.
+select_form_model(
+  "examples/survey/form.yaml", "survey", "2026.2",
+  package = "form.model"
+)
+```
+
+## What a form model contains
 
 A `form_model` is the checked definition itself, with an S3 class:
 
 ```{r}
-names(m)
+# Inspect the top-level form model properties.
+names(model_definition)
 ```
 
 It directly contains the form identity, versions, reference declarations, and sheets.
@@ -51,31 +79,58 @@ It directly contains the form identity, versions, reference declarations, and sh
 Sheets use worksheet names, and their fields use local field names:
 
 ```{r}
-names(m$sheets)
-names(m$sheets$Metadata$fields)
-m$sheets$Metadata$fields$submission[c("mandatory", "location", "type")]
+# List the worksheets in declaration order.
+names(model_definition$sheets)
+# List the metadata fields in declaration order.
+names(model_definition$sheets$Metadata$fields)
+# Inspect the submission identifier's requiredness, cell and type.
+model_definition$sheets$Metadata$fields$submission[c("mandatory", "location", "type")]
 ```
 
 The YAML path is used in loading errors, then discarded after a successful load.
 
 The S3 class selects the compact `print()` method shown above. It does not make the object immutable.
 
+## Inspect field constraints and locations
+
+```{r}
+# Inspect the observation unit's allowed values and required-field condition.
+form_field(model_definition, "Observations.unit")[c("enum", "required_field")]
+# Inspect the station's reference binding.
+form_field(model_definition, "Observations.station")$reference
+# Locate the first observation row in the form.
+form_layout(model_definition, "Observations")$start_row
+
+# Check the structure and consistency of the definition.
+check_form_model(form_definition(model_definition))
+```
+
 ## Diagnose a definition
 
 ```{r}
-d <- form_definition(m)
-d$sheets[[2]]$fields[[1]]$code_list <- "missing"
-result <- check_form_model(d, resource = "my-definition.yaml")
-result$diagnostics
-stopifnot(!result$valid)
+# Copy the definition for an invalid-reference example.
+invalid_definition <- form_definition(model_definition)
+# Point the station binding at an undeclared table.
+invalid_definition$sheets$Observations$fields$station$reference$table <- "missing"
+
+# Check the changed definition without throwing an error.
+definition_check <- check_form_model(invalid_definition, resource = "my-definition.yaml")
+# Display the reported form model errors.
+definition_check$diagnostics
+# Confirm that the changed definition was rejected.
+stopifnot(!definition_check$valid)
 ```
 
 `as_form_model()` and `read_form_model()` throw `model_form_error` when a definition is invalid.
 
 ```{r}
-error <- tryCatch(as_form_model(d, "my-definition.yaml"), model_form_error = identity)
-error$path
-error$diagnostics
+# Capture the error raised when constructing the invalid form model.
+definition_error <- tryCatch(
+  as_form_model(invalid_definition, "my-definition.yaml"), model_form_error = identity)
+# Inspect the property that caused the error.
+definition_error$path
+# Inspect the full set of definition errors.
+definition_error$diagnostics
 ```
 
 ## Read next
@@ -83,4 +138,13 @@ error$diagnostics
 - [Authoring model definitions](model-authoring.html): create your own form.
 - [Model specification](model-specification.html): field types, constraints and layouts.
 - [Distributing models](downstream-packages.html): use models in another package.
-- [Function reference](https://ultreia-io.github.io/form.model/reference/index.html): API details.
+```{r api-link, echo=FALSE, results="asis"}
+# Link to the website API index or explain how to open installed function help.
+if (identical(Sys.getenv("IN_PKGDOWN"), "true")) {
+  # Render the relative website link.
+  cat("- [Function reference](../reference/index.html): API details.\n")
+} else {
+  # Point readers to the installed help index.
+  cat("Open the function reference with `help(package = \"form.model\")`.\n")
+}
+```

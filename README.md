@@ -2,24 +2,59 @@
 
 [![Build](https://github.com/ultreia-io/form.model/actions/workflows/Build.yaml/badge.svg?branch=develop)](https://github.com/ultreia-io/form.model/actions/workflows/Build.yaml?query=branch%3Adevelop)
 [![Test Coverage](https://github.com/ultreia-io/form.model/actions/workflows/TestCoverage.yaml/badge.svg?branch=main)](https://github.com/ultreia-io/form.model/actions/workflows/TestCoverage.yaml?query=branch%3Amain)
-[![Coverage](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fultreia-io.github.io%2Fform.model%2Fcoverage%2Fcoverage.xml&query=round%28%2Fcoverage%2F%40line-rate+%2A+1000%29+div+10&label=coverage&suffix=%25&color=brightgreen)](https://ultreia-io.github.io/form.model/articles/coverage.html)
-[![Website](https://img.shields.io/badge/website-documentation-blue)](https://ultreia-io.github.io/form.model/)
+[![Coverage](coverage/badge.svg)](articles/coverage.html)
+[![Website](https://img.shields.io/badge/website-documentation-blue)](index.html)
 [![Latest
 release](https://img.shields.io/github/v/release/ultreia-io/form.model?display_name=tag&sort=semver)](https://github.com/ultreia-io/form.model/releases/latest)
+[![CRAN version](https://www.r-pkg.org/badges/version/form.model)](https://CRAN.R-project.org/package=form.model)
 [![License](https://img.shields.io/github/license/ultreia-io/form.model)](https://github.com/ultreia-io/form.model/blob/main/LICENSE)
 
-Neutral, versioned form definitions with explicit YAML resources and
-ordered workbook layouts.
+Read the [Terminology](articles/terminology.html) for the concepts used throughout this documentation.
 
-**Model checks validate definitions. They do not validate submitted form
-data.**
+## About this project
+
+`form.model` gives R packages a shared definition of the Excel forms they work with.
+
+A **form** is an Excel workbook used to collect data. Its **form model** describes the expected structure and rules in YAML.
+
+A form model defines:
+
+- The sheets, their order, and the positions of fixed cells or repeated data rows.
+- The fields, their types, required values and constraints.
+- The keys that identify records and connect related sheets.
+- The catalogue tables and named lookups required by reference fields.
+
+The package loads these definitions, checks their consistency, and exposes them through a common R API.
+
+A form model has an identity and version, so applications can explicitly select the definition for a particular form.
+
+Consumers share the form model instead of each maintaining their own description of the form.
+
+The package is independent of any domain. Concrete forms and reference catalogues belong to the packages using it.
+
+Form model checks verify the definition itself. The related packages below use it to work with forms and submitted data.
+
+## Related packages
+
+- [form.references](https://github.com/ultreia-io/form.references) loads reference catalogues and resolves form model lookups.
+- [form.validation](https://github.com/ultreia-io/form.validation) validates submitted data against form models and references.
+- [form.tools](https://github.com/ultreia-io/form.tools) splits forms using form model layouts and keys.
 
 ## Installation
 
-Install the latest released version directly from GitHub:
+Install the latest version available on CRAN:
 
 ``` r
-install.packages("pak") # Once
+# Install form.model from CRAN.
+install.packages("form.model")
+```
+
+Alternatively, install the latest GitHub release:
+
+``` r
+# Install the package installer once.
+install.packages("pak")
+# Install the latest released form.model package.
 pak::pak("ultreia-io/form.model@*release")
 ```
 
@@ -28,99 +63,26 @@ pak::pak("ultreia-io/form.model@*release")
 For the development version:
 
 ``` r
+# Install form.model from the development branch.
 pak::pak("ultreia-io/form.model@develop")
 ```
 
-## Start here
+## Getting started
 
-``` r
-library(form.model)
-directory <- system.file("examples", package = "form.model")
-m <- load_form_model("survey", directory)
+Follow the [Getting started guide](articles/form.model.html)
+to load a form model, inspect its fields and diagnose invalid definitions.
 
-form_field(m, "Observations.unit")[c("enum", "required_field")]
-form_layout(m, "Observations")$start_row
-check_form_model(form_definition(m))
-```
-
-The name `survey` resolves exactly to `survey-form.yaml` in the supplied
-directory.
-
-Use separate directories for different versions. No directory scanning
-or latest-version selection occurs.
-
-Explicit file loading and exact version selection remain available:
-
-``` r
-select_form_model(
-  "examples/survey-form.yaml", "survey", "2026.2",
-  package = "form.model"
-)
-```
-
-## Example workbooks
-
-The installed `examples/` directory includes `survey.xlsx` and `survey-empty.xlsx`, matching `survey-form.yaml`.
-The populated workbook contains three synthetic observations; the matching template has empty data regions.
-See `inst/examples/README.md` for the records and expected split.
-
-## Contract
-
-- Independent schema and form versions.
-- Ordered sheets, fields, fixed cells, and table columns.
-- Explicit types and compact constraints, including `mandatory`.
-- Separate code-list and registry declarations; callers supply their data.
-- Structured definition diagnostics and ordinary list/S3 values.
-- One runtime dependency: `yaml`. Loading the package has no external
-  side effects.
-
-## Model defaults and conventions
-
-These omitted properties receive values from `form.model`:
-
-| Model YAML                   | Effective meaning                                                             |
-|------------------------------|-------------------------------------------------------------------------------|
-| `mandatory` omitted          | The field may be absent or null; `form_fields()` returns `mandatory = FALSE`. |
-| `severity` omitted           | An unmatched code or registry value is an error.                              |
-
-Table column counts are derived from the fields. Other omissions do not invent values.
-
-Every sheet listed under `sheets` is mandatory. There is no sheet-level
-flag. Cell layouts declare `column_count`. Table column counts are derived
-from the fields, whose mapping order defines column order. An explicit table
-`column_count` is optional and must match the number of fields. An
-optional `row_count` declares an exact extent. Fixed fields must lie
-inside all declared dimensions.
-
-`form_definition()` preserves the compact YAML declaration.
-`form_sheets()` and `form_layout()` expose the derived table column counts.
-`form_fields()` returns effective fields with derived full IDs, columns,
-and the resolved defaults above.
-
-Declare code-list IDs under `references.code_lists` and registry IDs under `references.registries`.
-Use `code_list` or `registry` on a field to bind it to a declared ID.
-Registry bindings may specify `matching: name`, `aliases`, and `severity`.
-Each registry binding selects a `column` from its declared table.
-Inspect the declarations with `form_code_lists()` and `form_registries()`.
+The guide includes downloads of the YAML definition, populated form and empty form.
 
 ## Guides
 
-- [Getting
-  started](https://ultreia-io.github.io/form.model/articles/form.model.html)
 - [Model authoring and schema
-  dialect](https://ultreia-io.github.io/form.model/articles/model-authoring.html)
+  dialect](articles/model-authoring.html)
 - [Downstream package
-  integration](https://ultreia-io.github.io/form.model/articles/downstream-packages.html)
+  integration](articles/downstream-packages.html)
 - [API
-  reference](https://ultreia-io.github.io/form.model/reference/index.html)
-- [Contributing](https://ultreia-io.github.io/form.model/CONTRIBUTING.html) and [maintenance](https://ultreia-io.github.io/form.model/DEVELOPMENT.html)
-
-## Boundaries
-
-This package loads, checks, and exposes form definitions.
-
-Workbook reading, submitted-data validation, and database loading belong
-to consuming packages.
+  reference](reference/index.html)
+- [Contributing](CONTRIBUTING.html) and [maintenance](DEVELOPMENT.html)
 
 ## License
 

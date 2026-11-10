@@ -15,7 +15,9 @@
 #'   Coordinates are decimal degrees: latitude is in `[-90, 90]` and longitude
 #'   in `[-180, 180]`, including both endpoints. Numeric text is not coerced.
 #' @examples
+#' # Check whether the value matches the email type.
 #' form_value_matches_type("contact@example.org", "email")
+#' # Check whether the value matches the datetime type.
 #' form_value_matches_type("2026-10-18T12:00:00Z", "datetime")
 #' @export
 form_value_matches_type <- function(x, type) {

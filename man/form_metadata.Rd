@@ -16,6 +16,8 @@ A list with \code{form} and \code{schema_version}.
 Get form identity and versions
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
-form_metadata(model)
+# Load the bundled survey model.
+model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+# Inspect the model identity and declared reference catalogues.
+form_metadata(model_definition)
 }

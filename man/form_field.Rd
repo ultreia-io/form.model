@@ -18,6 +18,8 @@ One definition as returned by \code{\link[=form_fields]{form_fields()}}. Unknown
 Get one field
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
-form_field(model, "Observations.unit")$enum
+# Load the bundled survey model.
+model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+# Inspect the allowed values for the observation unit.
+form_field(model_definition, "Observations.unit")$enum
 }

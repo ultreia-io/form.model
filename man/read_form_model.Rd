@@ -24,6 +24,8 @@ for booleans. Tags, anchors, aliases, merges, directives and document markers
 are unsupported. The source path is not stored in the model.
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
-form_metadata(model)
+# Load the bundled survey model.
+model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+# Inspect the model identity and declared reference catalogues.
+form_metadata(model_definition)
 }

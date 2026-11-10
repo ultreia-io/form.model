@@ -1,0 +1,47 @@
+---
+title: "Terminology"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Terminology}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+These terms describe forms and their definitions in `form.model`.
+
+## Main concepts
+
+| Term       | Meaning                                                                                           |
+|------------|---------------------------------------------------------------------------------------------------|
+| Form       | An Excel workbook used to collect data.                                                           |
+| Form model | A versioned YAML definition of a form’s sheets, fields, layout and constraints.                   |
+| Consumer   | A package, tool or application using a form model to import, export, validate or transform forms. |
+
+## Form model definition
+
+### Structure
+
+| Term   | Meaning                                                                              |
+|--------|--------------------------------------------------------------------------------------|
+| Sheet  | A worksheet within a form, containing fixed cells or repeated records.               |
+| Field  | A named item of data with a declared type and a position in the form.                |
+| Record | One row of related field values in a sheet with a table layout.                      |
+| Layout | The arrangement of fields in fixed cells or table columns, with declared dimensions. |
+
+### Validation declarations
+
+| Term        | Meaning                                                                                 |
+|-------------|-----------------------------------------------------------------------------------------|
+| Field type  | The kind of value a field accepts, such as text, an integer, a date or a boolean.       |
+| Constraint  | A requirement on a field or record, such as requiredness, allowed values or uniqueness. |
+| Primary key | One or more fields whose combined values identify a record within a sheet.              |
+| Parent key  | Fields that connect a record to the primary key of a record in another sheet.           |
+
+### Reference declarations
+
+| Term                | Meaning                                                                             |
+|---------------------|-------------------------------------------------------------------------------------|
+| Reference catalogue | A named collection of reference tables available from a configured source.          |
+| Reference table     | A table of reference records, such as countries, stations or contacts.              |
+| Lookup              | A named way to find rows in a reference table using a column and matching settings. |
+| Reference binding   | A field’s declaration of the catalogue, table and lookup used to check its value.   |

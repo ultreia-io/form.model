@@ -15,14 +15,13 @@ reference:
       - form_field
       - form_sheets
       - form_layout
-      - form_code_lists
-      - form_registries
+      - form_references
       - print.form_model
       - print.form_model_check
 articles:
   - title: Guides
     navbar: Guides
-    contents: [form.model, model-authoring, model-specification, downstream-packages]
+    contents: [terminology, form.model, model-authoring, model-specification, downstream-packages]
   - title: Development
     contents: [articles/coverage]
 navbar:
@@ -33,6 +32,8 @@ navbar:
     articles:
       text: Articles
       menu:
+        - text: Terminology
+          href: articles/terminology.html
         - text: Authoring model definitions
           href: articles/model-authoring.html
         - text: Model specification
@@ -43,7 +44,7 @@ navbar:
       text: Coverage
       href: articles/coverage.html
     intro:
-      text: Get started
+      text: Getting started
       href: articles/form.model.html
     community:
       text: Community

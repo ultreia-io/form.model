@@ -20,9 +20,14 @@ Table layouts include \code{column_count} derived from the ordered fields.
 An optional \code{primary_key} preserves the declared sequence of local field names.
 Key components must be filled and their combination must identify one row;
 this package checks the declaration, not submitted values.
+\code{unique_key} preserves an ordered key whose complete values must be unique.
+\code{at_least_one} preserves selected fields and optional severity (default error);
+populated rows must supply at least one selected value.
 Use \code{\link[=form_definition]{form_definition()}} for the original declarations.
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
-names(form_sheets(model))
+# Load the bundled survey model.
+model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+# List the worksheet names in workbook order.
+names(form_sheets(model_definition))
 }

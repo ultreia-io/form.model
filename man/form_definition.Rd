@@ -11,7 +11,7 @@ form_definition(model)
 }
 \value{
 An ordinary model definition with \code{form}, \code{sheets}, and
-\code{references} containing declared \code{code_lists} and \code{registries}.
+\code{references} containing named catalogues and their declared tables.
 }
 \description{
 Get the complete definition
@@ -21,6 +21,8 @@ Accessors preserve declaration order and do not revalidate models.
 Treat checked models as read-only. Invalid model arguments raise \code{model_form_error}.
 }
 \examples{
-model <- read_form_model("examples/survey-form.yaml", "form.model")
-form_definition(model)$form
+# Load the bundled survey model.
+model_definition <- read_form_model("examples/survey/form.yaml", "form.model")
+# Inspect the declared form identity.
+form_definition(model_definition)$form
 }
