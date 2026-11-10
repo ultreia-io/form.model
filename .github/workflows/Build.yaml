@@ -65,10 +65,8 @@ jobs:
       _R_CHECK_SYSTEM_CLOCK_: 'false'
       _R_CHECK_CRAN_INCOMING_: 'true'
       _R_CHECK_CRAN_INCOMING_REMOTE_: 'true'
-      # Read CRAN metadata from CRAN rather than the binary package mirror.
-      R_CRAN_SRC: https://cloud.r-project.org
-      R_CRAN_WEB: https://cloud.r-project.org
-      R_REPOSITORIES: ${{ github.workspace }}/tools/cran-repositories
+      # Share CRAN mirror settings with local checks.
+      R_CHECK_ENVIRON: ${{ github.workspace }}/tools/check.Renviron
 
     steps:
       # Keep downloaded APT packages: Docker images normally delete them after installation.
@@ -96,15 +94,16 @@ jobs:
           restore-keys: |
             apt-rocker-${{ steps.apt-cache.outputs.r-version }}-${{ steps.apt-cache.outputs.os-version }}-${{ runner.arch }}-v1-
 
-      # Add Git, R check tools and lsb_release, which setup-r uses to identify Ubuntu.
+      # Add R check tools, Ubuntu identification and curl/gpg for the Codecov uploader.
       - name: Install Linux check tools
         if: runner.os == 'Linux'
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends git qpdf ghostscript lsb-release
+          apt-get install -y --no-install-recommends git qpdf ghostscript lsb-release sudo texinfo xz-utils curl gpg tidy
 
       # An explicit ref selects a release commit; otherwise use the event commit (the proposed merge for PRs).
       - name: Check out repository
+        id: checkout
         uses: actions/checkout@v7.0.1
         with:
           ref: ${{ inputs.ref || github.sha }}
@@ -127,6 +126,17 @@ jobs:
       # Pandoc is needed to render the package vignettes.
       - name: Set up Pandoc
         uses: r-lib/actions/setup-pandoc@v2.12.1
+      # Provide LaTeX for building and checking the PDF manual.
+      - name: Set up TinyTeX
+        uses: r-lib/actions/setup-tinytex@v2.12.1
+      # R's PDF manual uses Courier fonts, which the minimal TinyTeX bundle may omit.
+      - name: Install manual fonts
+        if: runner.os != 'Windows'
+        run: tlmgr install courier makeindex
+      - name: Install manual fonts on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: tlmgr install courier makeindex
 
       # Restore the last metadata snapshot before dependency resolution on every platform.
       # A new key saves any refreshed metadata; pak still decides when it needs an update.
@@ -145,6 +155,8 @@ jobs:
           extra-packages: |
             any::rcmdcheck
             any::roxygen2
+            ${{ runner.os == 'Linux' && matrix.config.r == 'release' && 'any::covr' || '' }}
+            ${{ runner.os == 'Linux' && matrix.config.r == 'release' && 'any::xml2' || '' }}
           needs: check
 
       # Rd documentation is generated from roxygen comments before building the source package.
@@ -152,12 +164,13 @@ jobs:
         shell: Rscript {0}
         run: roxygen2::roxygenise()
 
-      # Build and check installation, tests, examples and vignettes. Skip only the PDF manual.
+      # Build and check installation, tests, examples, vignettes and the PDF manual.
       # Warnings and errors fail this check; notes remain visible in the results.
       - name: Check package
         uses: r-lib/actions/check-r-package@v2.12.1
         with:
-          args: 'c("--no-manual", "--as-cran")'
+          args: '"--as-cran"'
+          build_args: 'character()'
           check-dir: '"build"'
           error-on: '"warning"'
 
@@ -166,3 +179,35 @@ jobs:
         if: always()
         shell: Rscript {0}
         run: source("tools/check-ci-results.R")
+
+      # Measure coverage once, after successful checks on Linux with the release version of R.
+      - name: Test coverage
+        if: success() && runner.os == 'Linux' && matrix.config.r == 'release'
+        shell: Rscript {0}
+        run: |
+          # Disable IDE source markers during instrumentation.
+          options(covr.rstudio_source_markers = FALSE)
+          # Run the package tests with coverage instrumentation.
+          coverage_result <- covr::package_coverage(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "coverage-package")
+          )
+          # Show the coverage summary in the job log.
+          print(coverage_result)
+          # Export the measured coverage for Codecov.
+          covr::to_cobertura(coverage_result, filename = "coverage.xml")
+
+      - name: Upload coverage to Codecov
+        if: success() && runner.os == 'Linux' && matrix.config.r == 'release'
+        uses: codecov/codecov-action@v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: ultreia-io/form.model
+          # Attribute release checks to the merged main commit, rather than the release PR head.
+          override_commit: ${{ steps.checkout.outputs.commit }}
+          override_branch: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref || '' }}
+          files: coverage.xml
+          plugins: noop
+          disable_search: true
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN != '' }}

@@ -129,7 +129,7 @@ jobs:
         shell: Rscript {0}
         run: roxygen2::roxygenise()
 
-      # Build the site and its coverage reports under docs/.
+      # Build the documentation site under docs/.
       # .nojekyll tells Pages to serve the generated files without Jekyll processing.
       - name: Build pkgdown site
         shell: Rscript {0}

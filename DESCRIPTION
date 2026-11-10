@@ -1,9 +1,10 @@
 Package: form.model
 Title: Neutral Versioned Form Definitions and Workbook Layouts
-Version: 0.6.0
+Version: 0.6.1
 Authors@R:
-    person("Tony", "Chemit", role = c("aut", "cre"),
-           email = "dev@tchemit.fr")
+    person("Tony", "Chemit", role = c("aut", "cre", "cph"),
+           email = "dev@tchemit.fr",
+           comment = c(ORCID = "0009-0007-1802-5256", URL = "https://ultreia.io"))
 Description: Loads explicit YAML resources describing versioned forms,
     fields, declarative constraints, reference requirements, and workbook
     layouts. Checks model definitions against an installed YAML schema and
@@ -21,5 +22,5 @@ VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/Needs/coverage: covr, xml2
-Config/Needs/website: pkgdown, covr, htmltools, xml2
+Config/Needs/website: pkgdown
 Config/roxygen2/version: 8.1.1
