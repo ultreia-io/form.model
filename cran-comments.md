@@ -1,17 +1,16 @@
 ## Check results
 
-R CMD check --as-cran for form.model 0.6.1 on:
+R CMD check --as-cran for form.model on:
 
 * Local computer: Linux (elementary OS 8), R 4.6.2.
-* GitHub Actions: Ubuntu, R release.
-* GitHub Actions: macOS, R release.
-* GitHub Actions: Windows, R release.
+* GitHub Actions: Ubuntu, R 4.6.2 (release).
+* GitHub Actions: Ubuntu, R-devel (2026-11-09 r90865).
+* GitHub Actions: macOS, R 4.6.2 (release).
+* GitHub Actions: Windows, R 4.6.2 (release, UCRT).
 
-Local results: 0 errors, 0 warnings, 1 NOTE (days since last update: 4).
+Results: 0 errors, 0 warnings, 1 NOTE concerning the short interval since the previous CRAN release.
 
-## Release interval
+## Resubmission
 
-The current CRAN version is 0.3.2, our first CRAN release.
-Its submission process took approximately two to three weeks, during which development continued.
-Version 0.6.1 brings CRAN up to date with that work, including reference bindings, constraints and documentation.
-The four-day interval is since CRAN publication of 0.3.2, not the time spent developing this update.
+This resubmission fixes the invalid file URIs reported in the README for version 0.6.1.
+The README now links to the public documentation pages and remains included in the source package.
