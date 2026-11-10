@@ -9,6 +9,7 @@
 ^CODE_OF_CONDUCT\.md$
 ^CONTRIBUTING\.md$
 ^DEVELOPMENT\.md$
+^cran-comments\.md$
 ^SECURITY\.md$
 ^VERIFICATION\.md$
 ^.*\.tar\.gz.*$
