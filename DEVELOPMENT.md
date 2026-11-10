@@ -50,11 +50,11 @@ This generates documentation, runs tests, builds and checks the archive with `--
 
 Local and CI checks share the CRAN mirror settings in `tools/check.Renviron`. All CRAN checks remain enabled.
 
-The site includes a native coverage page at `docs/articles/coverage.html`, using the shared theme and navigation.
+The **Build** workflow measures coverage with `covr` on Linux after successful checks and uploads it to Codecov.
 
-Coverage CSV and XML stay in `docs/coverage/`. Archives and check output stay in `build/`.
+The README coverage badge links to the Codecov report. Website builds do not run coverage checks.
 
-Run `Rscript tools/coverage.R` to refresh coverage data alone; rebuild the site to refresh its page.
+Archives and check output stay in `build/`.
 
 `roxygen2`, `rcmdcheck`, and `pkgload` are development tools, not runtime dependencies.
 

@@ -1,13 +1,14 @@
 # form.model
 
 [![Build](https://img.shields.io/github/actions/workflow/status/ultreia-io/form.model/Build.yaml?branch=develop&label=Build&logo=githubactions&logoColor=white)](https://github.com/ultreia-io/form.model/actions/workflows/Build.yaml?query=branch%3Adevelop)
-[![Test Coverage](https://github.com/ultreia-io/form.model/actions/workflows/TestCoverage.yaml/badge.svg?branch=main)](https://github.com/ultreia-io/form.model/actions/workflows/TestCoverage.yaml?query=branch%3Amain)
-[![Coverage](https://ultreia-io.github.io/form.model/coverage/badge.svg)](https://ultreia-io.github.io/form.model/articles/coverage.html)
 [![Website](https://img.shields.io/badge/website-documentation-blue?logo=readthedocs&logoColor=white)](index.html)
 [![License](https://img.shields.io/badge/license-LGPL--2.1-blue?logo=gnu&logoColor=white)](https://github.com/ultreia-io/form.model/blob/main/LICENSE)
 
 [![Latest release](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fultreia-io%2Fform.model%2Freleases%2Flatest&query=%24.tag_name&label=Latest%20release&color=blue&logo=github&logoColor=white)](https://github.com/ultreia-io/form.model/releases/latest)
 [![CRAN release](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcrandb.r-pkg.org%2Fform.model&query=%24.Version&label=CRAN%20release&color=brightgreen&logo=r&logoColor=white)](https://CRAN.R-project.org/package=form.model)
+
+[![Coverage develop](https://img.shields.io/codecov/c/github/ultreia-io/form.model/develop?label=coverage%20develop&logo=codecov)](https://app.codecov.io/gh/ultreia-io/form.model/tree/develop)
+[![Coverage main](https://img.shields.io/codecov/c/github/ultreia-io/form.model/main?label=coverage%20main&logo=codecov)](https://app.codecov.io/gh/ultreia-io/form.model/tree/main)
 
 ## About this project
 
