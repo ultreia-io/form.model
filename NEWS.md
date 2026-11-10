@@ -1,3 +1,8 @@
+# form.model 0.6.2
+
+* Fix README documentation links in the source package while keeping website links relative.
+* Check Linux R-devel before release and cache CI toolchains and dependencies.
+
 # form.model 0.6.1
 
 * Submit the checked GitHub release archive to CRAN automatically, with duplicate submission protection.
