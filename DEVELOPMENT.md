@@ -40,16 +40,15 @@ Consistency checks run only when structure passes.
 
 ## Local verification
 
-Run from the package root with development dependencies installed:
+Run from the package root with development dependencies and LaTeX installed:
 
 ```sh
-Rscript -e 'roxygen2::roxygenise(); testthat::test_local()'
-mkdir -p build
-(cd build && R CMD build --no-manual ..)
-package_version=$(Rscript -e 'cat(read.dcf("DESCRIPTION")[1, "Version"])')
-R CMD check --no-manual --output=build "build/form.model_${package_version}.tar.gz"
-Rscript tools/build-site.R
+Rscript tools/check.R
 ```
+
+This generates documentation, runs tests, builds and checks the archive with `--as-cran`, then builds the website.
+
+Local and CI checks share the CRAN mirror settings in `tools/check.Renviron`. All CRAN checks remain enabled.
 
 The site includes a native coverage page at `docs/articles/coverage.html`, using the shared theme and navigation.
 
@@ -63,7 +62,7 @@ Review coverage gaps for missing behaviour. Check installed resources, runnable 
 
 Keep the YAML schema authoritative. Semantic invariants live in R and must have focused behavioural tests.
 
-## Release
+## GitHub Release
 
 1. **Prepare the release on `develop`:**
 
@@ -82,8 +81,39 @@ Keep the YAML schema authoritative. Semantic invariants live in R and must have 
 
    1. **Wait for the checks:** all checks on the release PR must be green.
    2. **Merge:** click **Merge pull request**, then **Confirm merge**.
+   3. Merging automatically starts the **Publish Release** workflow.
 
-**Publish Release** publishes the package, checksum and documentation automatically.
+The **Publish Release** workflow:
+
+1. Publishes the package archive, checksum and documentation.
+2. **Submits the same archive to CRAN**.
+
+## Manual CRAN submission
+
+Use this fallback only if the release has not already been submitted by CI.
+
+Start from a clean working tree. Replace `0.6.0` with the release version to submit.
+
+```sh
+# Fetch the published release tags.
+git fetch origin --tags
+# Check out the release tag.
+git switch --detach 0.6.0
+```
+
+Run these commands in R from the package root, with `devtools` installed.
+
+```r
+# Build and run R CMD check --as-cran, including the PDF manual and incoming checks.
+devtools::check(args = "--as-cran", manual = TRUE, remote = TRUE, error_on = "warning")
+
+# After resolving errors and warnings and reviewing NOTES, submit the release to CRAN.
+devtools::submit_cran()
+```
+
+This manual route rebuilds from the release tag. CI submits the existing GitHub archive unchanged.
+
+Confirm CRAN's email, then wait for its checks and response.
 
 ## License
 
