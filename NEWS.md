@@ -1,3 +1,9 @@
+# form.model 0.6.1
+
+* Submit the checked GitHub release archive to CRAN automatically, with duplicate submission protection.
+* Publish build coverage to Codecov for develop and main; remove the custom coverage report and website dependencies.
+* Refresh release badges and document full local CRAN checks and manual submission.
+
 # form.model 0.6.0
 
 * Replace catalogue-specific reference declarations with catalogue, table and lookup bindings.
