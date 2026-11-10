@@ -24,9 +24,16 @@ You will load the form model, inspect its contents, and see how invalid definiti
 
 ## Download the example files
 
-- [Form model — form.yaml](../examples/survey/form.yaml)
-- [Populated form — form.xlsx](../examples/survey/form.xlsx)
-- [Empty form — form-empty.xlsx](../examples/survey/form-empty.xlsx)
+```{r example-downloads, echo=FALSE, results="asis"}
+# Use relative downloads on the website and installed resources in the package guide.
+if (identical(Sys.getenv("IN_PKGDOWN"), "true")) {
+  # Render links relative to the website article.
+  cat("- [Form model — form.yaml](../examples/survey/form.yaml)\n- [Populated form — form.xlsx](../examples/survey/form.xlsx)\n- [Empty form — form-empty.xlsx](../examples/survey/form-empty.xlsx)\n")
+} else {
+  # Explain where the installed package keeps the example files.
+  cat("Find these files with `system.file(\"examples\", \"survey\", package = \"form.model\")`.\n")
+}
+```
 
 The populated form contains three synthetic observations. The empty form has no data rows.
 
@@ -131,4 +138,13 @@ definition_error$diagnostics
 - [Authoring model definitions](model-authoring.html): create your own form.
 - [Model specification](model-specification.html): field types, constraints and layouts.
 - [Distributing models](downstream-packages.html): use models in another package.
-- [Function reference](../reference/index.html): API details.
+```{r api-link, echo=FALSE, results="asis"}
+# Link to the website API index or explain how to open installed function help.
+if (identical(Sys.getenv("IN_PKGDOWN"), "true")) {
+  # Render the relative website link.
+  cat("- [Function reference](../reference/index.html): API details.\n")
+} else {
+  # Point readers to the installed help index.
+  cat("Open the function reference with `help(package = \"form.model\")`.\n")
+}
+```

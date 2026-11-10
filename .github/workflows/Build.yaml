@@ -60,11 +60,15 @@ jobs:
       PKG_METADATA_CACHE_DIR: ${{ github.workspace }}/.github/pak-metadata
       # Authenticate GitHub dependency downloads using the workflow token.
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      # Keep source references for diagnostics. Skip CRAN submission and runner clock checks in CI.
+      # Keep source references and enable CRAN incoming checks, including remote checks.
       R_KEEP_PKG_SOURCE: yes
       _R_CHECK_SYSTEM_CLOCK_: 'false'
-      _R_CHECK_CRAN_INCOMING_: 'false'
-      _R_CHECK_CRAN_INCOMING_REMOTE_: 'false'
+      _R_CHECK_CRAN_INCOMING_: 'true'
+      _R_CHECK_CRAN_INCOMING_REMOTE_: 'true'
+      # Read CRAN metadata from CRAN rather than the binary package mirror.
+      R_CRAN_SRC: https://cloud.r-project.org
+      R_CRAN_WEB: https://cloud.r-project.org
+      R_REPOSITORIES: ${{ github.workspace }}/tools/cran-repositories
 
     steps:
       # Keep downloaded APT packages: Docker images normally delete them after installation.
@@ -149,10 +153,16 @@ jobs:
         run: roxygen2::roxygenise()
 
       # Build and check installation, tests, examples and vignettes. Skip only the PDF manual.
-      # Notes and warnings fail this check, just like errors; results are kept under build/.
+      # Warnings and errors fail this check; notes remain visible in the results.
       - name: Check package
         uses: r-lib/actions/check-r-package@v2.12.1
         with:
           args: 'c("--no-manual", "--as-cran")'
           check-dir: '"build"'
-          error-on: '"note"'
+          error-on: '"warning"'
+
+      # Reject interrupted checks even if the check action reports success.
+      - name: Verify check completion
+        if: always()
+        shell: Rscript {0}
+        run: source("tools/check-ci-results.R")

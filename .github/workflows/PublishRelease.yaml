@@ -21,7 +21,7 @@ jobs:
     if: >-
       github.event.pull_request.merged == true &&
       github.event.pull_request.head.repo.full_name == github.repository &&
-      startsWith(github.event.pull_request.head.ref, 'release/v')
+      startsWith(github.event.pull_request.head.ref, 'release/')
     uses: ./.github/workflows/Build.yaml
     with:
       ref: ${{ github.event.pull_request.merge_commit_sha }}
@@ -45,8 +45,12 @@ jobs:
       PKG_METADATA_CACHE_DIR: ${{ github.workspace }}/.github/pak-metadata
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       RELEASE_BRANCH: ${{ github.event.pull_request.head.ref }}
-      _R_CHECK_CRAN_INCOMING_: 'false'
-      _R_CHECK_CRAN_INCOMING_REMOTE_: 'false'
+      _R_CHECK_CRAN_INCOMING_: 'true'
+      _R_CHECK_CRAN_INCOMING_REMOTE_: 'true'
+      # Read CRAN metadata from CRAN rather than the binary package mirror.
+      R_CRAN_SRC: https://cloud.r-project.org
+      R_CRAN_WEB: https://cloud.r-project.org
+      R_REPOSITORIES: ${{ github.workspace }}/tools/cran-repositories
       _R_CHECK_SYSTEM_CLOCK_: 'false'
     steps:
       # Keep downloaded APT packages: Docker images normally delete them after installation.
@@ -110,7 +114,7 @@ jobs:
           if (!grepl("^[0-9]+[.][0-9]+[.][0-9]+$", version)) {
             stop("DESCRIPTION version must use X.Y.Z format; found: ", version, call. = FALSE)
           }
-          expected_branch <- paste0("release/v", version)
+          expected_branch <- paste0("release/", version)
           if (!identical(Sys.getenv("RELEASE_BRANCH"), expected_branch)) {
             stop("Release branch ", Sys.getenv("RELEASE_BRANCH"), " does not match DESCRIPTION version ",
                  version, "; expected branch: ", expected_branch, call. = FALSE)
@@ -119,7 +123,7 @@ jobs:
           if (!heading %in% readLines("NEWS.md")) {
             stop("NEWS.md is missing the heading: ", heading, call. = FALSE)
           }
-          cat(paste0("tag=v", version, "\n"), file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE)
+          cat(paste0("tag=", version, "\n"), file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE)
       # Pandoc renders package vignettes during the build.
       - name: Set up Pandoc
         uses: r-lib/actions/setup-pandoc@v2.12.1
@@ -146,13 +150,17 @@ jobs:
         shell: Rscript {0}
         run: roxygen2::roxygenise()
       # This job has its own workspace: build and check the archive that will be uploaded.
-      # Treat warnings and notes as failures as well as errors.
+      # Fail on warnings and errors; retain CRAN notes for review.
       - name: Build and check publication archive
         uses: r-lib/actions/check-r-package@v2.12.1
         with:
           args: 'c("--no-manual", "--as-cran")'
           check-dir: '"build"'
-          error-on: '"note"'
+          error-on: '"warning"'
+      # Require a completed check before publishing the archive.
+      - name: Verify check completion
+        shell: Rscript {0}
+        run: source("tools/check-ci-results.R")
       # Supply a checksum alongside the archive so downloads can be verified.
       - name: Create archive checksum
         working-directory: build
