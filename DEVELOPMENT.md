@@ -52,7 +52,7 @@ Local and CI checks share the CRAN mirror settings in `tools/check.Renviron`. Al
 
 The **Build** workflow measures coverage with `covr` on Linux after successful checks and uploads it to Codecov.
 
-The README coverage badge links to the Codecov report. Website builds do not run coverage checks.
+The README coverage badges links to the Codecov report.
 
 Archives and check output stay in `build/`.
 
@@ -66,9 +66,9 @@ Keep the YAML schema authoritative. Semantic invariants live in R and must have 
 
 1. **Prepare the release on `develop`:**
 
-   1. **Prepare the release files:** update the version in `DESCRIPTION`, finalize `NEWS.md` and documentation.
+   1. **Prepare the release files:** update the version in `DESCRIPTION`, finalize `NEWS.md`, `cran-comments.md` and documentation.
    2. **Perform the [local checks](#local-verification).**
-   3. **Commit the changes:** use `[form.model] Release <version>`, for example `[form.model] Release 0.2.0`.
+   3. **Commit the changes:** use `[form.model] Release <version>`.
    4. **Push the release commit.**
 
 2. **Start the release on GitHub:**
@@ -92,13 +92,13 @@ The **Publish Release** workflow:
 
 Use this fallback only if the release has not already been submitted by CI.
 
-Start from a clean working tree. Replace `0.6.0` with the release version to submit.
+Start from a clean working tree. Replace `version` with the release version to submit.
 
 ```sh
 # Fetch the published release tags.
 git fetch origin --tags
 # Check out the release tag.
-git switch --detach 0.6.0
+git switch --detach version
 ```
 
 Run these commands in R from the package root, with `devtools` installed.
